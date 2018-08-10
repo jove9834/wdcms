@@ -1,0 +1,76 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+	        <tr>
+	            <th width="100">页面标题： </th>
+	            <td>
+	            	<input type="text" name="setting[title]" class="form-control" data-dismiss="validate" data-required="true" value="{at_array_val($data, 'title')}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">模板： </th>
+	            <td>
+	            	<select name="setting[template]" class="form-control">
+						<option value="list-2.php" {if at_array_val($data, 'template')=='list-2.php'}selected{/if}>list-2.php</option>
+	            	</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">关键字搜索： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" id="keyword" name="setting[keyword]" value="1" {if at_array_val($data, 'keyword')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+	        <tr class="t-keyword" style="display:{if at_array_val($data, 'keyword')!=1}none{/if}">
+	            <th width="100">关键字提示文字： </th>
+	            <td>
+	            	<input type="text" name="setting[keyword_p]" class="form-control" value="{at_array_val($data, 'keyword_p')}">
+	            </td>
+	        </tr>
+	        <tr class="t-keyword" style="display:{if at_array_val($data, 'keyword')!=1}none{/if}">
+	            <th width="100">关键字对应字段： </th>
+	            <td>
+	            	<input type="text" name="setting[keyword_field]" class="form-control" value="{at_array_val($data, 'keyword_field')}">
+	            	<div class="valid-tip"><i class="icon-info-sign"></i>多个字段用逗号隔开</div>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">高级搜索： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" id="search" name="setting[search]" value="1" {if at_array_val($data, 'search')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+	 
+	        <tr>
+	            <th width="100">分页： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" id="page" name="setting[page]" value="1" {if at_array_val($data, 'page')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	<input type="hidden" name="id" value="{at_array_val($data, 'id')}"/>
+	</form>
+</div>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript">
+$(function(){
+	$('.checkbox input').label();
+	$('#keyword').click(function(){
+		$('.t-keyword').css('display', $(this).is(':checked')?'':'none');
+	});
+	
+});
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>

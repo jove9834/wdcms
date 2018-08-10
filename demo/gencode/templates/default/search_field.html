@@ -1,0 +1,130 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+			<tr>
+	            <th>字段： </th>
+	            <td>
+	            	<select id="filed" name="setting[field]" class="form-control">
+						{loop $fields $name}
+						<option value="{$name}" {if at_array_val($setting, 'field')==$name}selected{/if}>{$name}</option>
+						{/loop}
+						<option value="0" {if at_array_val($setting, 'field')=='0'}selected{/if}>自定义</option>
+					</select>
+					<input type="text" id="custom_field" name="setting[custom_field]" class="form-control {if at_array_val($setting, 'field')!='0'}hide{/if}" value="{at_array_val($setting, 'custom_field')}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">显示名称： </th>
+	            <td>
+	            	<input type="text" name="setting[name]" class="form-control" data-dismiss="validate" data-required="true" value="{at_array_val($setting, 'name')}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">比较类型： </th>
+	            <td>
+	            	<select name="setting[adj]" class="form-control">
+	            		<option value="EQ" {if at_array_val($setting, 'adj')=='EQ'}selected{/if}>等于</option>
+	            		<option value="LK" {if at_array_val($setting, 'adj')=='LK'}selected{/if}>包含</option>
+	            		<option value="LKA" {if at_array_val($setting, 'adj')=='LKA'}selected{/if}>以...开头</option>
+						<option value="LKB" {if at_array_val($setting, 'adj')=='LKB'}selected{/if}>以...结束</option>
+						<option value="IN" {if at_array_val($setting, 'adj')=='IN'}selected{/if}>IN</option>
+						<option value="NIN" {if at_array_val($setting, 'adj')=='NIN'}selected{/if}>Not In</option>
+						<option value="NE" {if at_array_val($setting, 'adj')=='NE'}selected{/if}>不等于</option>
+						<option value="LT" {if at_array_val($setting, 'adj')=='LT'}selected{/if}>小于</option>
+						<option value="LE" {if at_array_val($setting, 'adj')=='LE'}selected{/if}>小等于</option>
+						<option value="GT" {if at_array_val($setting, 'adj')=='GT'}selected{/if}>大于</option>
+						<option value="GE" {if at_array_val($setting, 'adj')=='GE'}selected{/if}>大等于</option>
+					</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">类型： </th>
+	            <td>
+	            	<select id="type" name="setting[type]" class="form-control">
+	            		<option value="text" {if at_array_val($setting, 'type')=='text'}selected{/if}>单行文本</option>
+	            		<option value="date" {if at_array_val($setting, 'type')=='date'}selected{/if}>日期</option>
+	            		<option value="betweendate" {if at_array_val($setting, 'type')=='betweendate'}selected{/if}>时间段</option>
+						<option value="checkbox" {if at_array_val($setting, 'type')=='checkbox'}selected{/if}>checkbox</option>
+						<option value="radio" {if at_array_val($setting, 'type')=='radio'}selected{/if}>radio</option>
+						<option value="select" {if at_array_val($setting, 'type')=='select'}selected{/if}>下拉选择框</option>
+						<option value="dict" {if at_array_val($setting, 'type')=='dict'}selected{/if}>字典选择框</option>
+						<option value="select2" {if at_array_val($setting, 'type')=='select2'}selected{/if}>select2</option>
+						<option value="oac" {if at_array_val($setting, 'type')=='oac'}selected{/if}>开关</option>
+					</select>
+	            </td>
+	        </tr>
+	        <tr class="t-all t-date {if !at_exists_strlist(at_array_val($setting, 'type'),'date,betweendate') }hide{/if}">
+	            <th width="100">日期格式： </th>
+	            <td>
+	            	<select name="setting[format]" class="form-control">
+	            		<option value="date" {if at_array_val($setting, 'format')=='date'}selected{/if}>日期</option>
+	            		<option value="time" {if at_array_val($setting, 'format')=='time'}selected{/if}>时间</option>
+	            		<option value="datetime" {if at_array_val($setting, 'format')=='datetime'}selected{/if}>日期时间</option>
+					</select>
+	            </td>
+	        </tr>
+	        <tr class="t-all t-checkbox t-radio t-select {if !at_exists_strlist(at_array_val($setting, 'type'),'checkbox,radio,select')}hide{/if}">
+	            <th width="100">选项： </th>
+	            <td>
+	            	<textarea name="setting[lists]" class="form-control" row="8" style="width:300px">{at_array_val($setting, 'lists')}</textarea>
+	            </td>
+	        </tr>
+	        <tr class="t-all t-dict {if at_array_val($setting, 'type')!='dict'}hide{/if}">
+	            <th width="100">字典类型： </th>
+	            <td>
+	            	<select name="setting[dict_type]" class="form-control">
+	            		<option value="image">图片</option>
+	            		<option value="attach">附件</option>
+					</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">Width： </th>
+	            <td>
+	            	<input type="text" name="setting[width]" class="form-control" value="{at_array_val($setting, 'width')}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">提示说明： </th>
+	            <td>
+	            	<input type="text" name="setting[tips]" class="form-control" value="{at_array_val($setting, 'tips')}">
+	            </td>
+	        </tr>
+			<tr>
+	            <th width="100">排序： </th>
+	            <td>
+	            	<input type="text" name="data[display_order]" class="form-control" data-dismiss="validate" data-number="true"  value="{at_array_val($data, 'display_order','0')}">
+	            </td>
+	        </tr>
+	        
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript">
+$(function(){
+	
+	$('#filed').change(function(){
+		if($(this).val() == '0')
+		{
+			$('#custom_field').removeClass('hide');
+		}
+		else
+		{
+			$('#custom_field').removeClass('hide').addClass('hide');
+			$('#custom_field').val('');
+		}
+	});
+	$('#type').change(function(){
+		$('.t-all').removeClass('hide').addClass('hide');
+		$('.t-'+$(this).val()).removeClass('hide');
+	})
+});
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>

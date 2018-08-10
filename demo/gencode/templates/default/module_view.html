@@ -1,0 +1,115 @@
+<style>
+.tm-btns a{
+	margin:0 5px;
+}
+</style>
+<div id="page">
+    <div class="page-top">
+        <nav class="navbar navbar-default">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">{lang('page_title')}[{$module['name']}]</a>
+            </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse">
+              	<ul class="nav navbar-nav">
+	                {if at_exists_strlist('list',$module['func'])}
+	                <li><a href="{at_url('list_page', array('module_id'=>$module['id']))}">列表页面</a></li>
+	                {/if}
+	                {if at_exists_strlist('new',$module['func'])}
+	                <li><a href="{at_url('add_page', array('module_id'=>$module['id']))}">添加页面</a></li>
+	                {/if}
+	                {if at_exists_strlist('search',$module['func'])}
+	                <li><a href="{at_url('search_page', array('module_id'=>$module['id']))}">高级查询页面</a></li>
+	                {/if}
+	                {if at_exists_strlist('controller',$module['func'])}
+	                <li><a href="{at_url('controller_page', array('module_id'=>$module['id']))}">控制类</a></li>
+	                {/if}
+              	</ul>
+              	<div class="nav-btns pull-right">
+					<a class="btn-icon m-list" title="返回模块列表" href="{at_url('module')}"></a>
+              	</div>
+            </div><!-- /.navbar-collapse -->
+
+        </nav>
+    </div>
+    <div class="page-center">
+		<div class="form-view">
+			<form id="my_form">
+			<div class="form-group">
+				<div class="group-top"></div>
+				<div class="group-title">模块信息</div>
+				<table width="100%" class="table-form">
+			        <tr>
+			            <th width="100">模块名称： </th>
+			            <td>
+			            	{$module['name']}
+			            </td>
+			        </tr>
+			        <tr>
+			            <th width="100">控制类名： </th>
+			            <td>
+			            	{$module['class_name']}
+			            </td>
+			        </tr>
+			        <tr>
+			            <th width="100">表名： </th>
+			            <td>
+			            	{$module['table_name']}
+			            </td>
+			        </tr>
+			        <tr>
+			            <th width="100">应用： </th>
+			            <td>
+			            	{$module['app']}
+			            </td>
+			        </tr>
+			        <tr>
+			            <th width="100">生成文件： </th>
+			            <td class="tm-btns">
+			            	<a href="{at_url('module/gen_all', array('module_id'=>$module['id']))}" class="btn btn-primary pull-left" data-dismiss="dialog" title="生成所有文件">生成所有文件</a>
+			            	{if at_exists_strlist('list',$module['func'])}
+								<a href="{at_url('module/gen_list', array('module_id'=>$module['id']))}" class="btn btn-default pull-left" data-dismiss="dialog" title="生成列表页面">生成列表页面</a>
+			            	{/if}
+			            	{if at_exists_strlist('new',$module['func'])}
+								<a href="{at_url('module/gen_add', array('module_id'=>$module['id']))}" class="btn btn-default pull-left" data-dismiss="dialog" title="生成添加页面">生成添加页面</a>
+			            	{/if}
+			            	{if at_exists_strlist('edit',$module['func'])}
+								<a href="{at_url('module/gen_edit', array('module_id'=>$module['id']))}" class="btn btn-default pull-left" data-dismiss="dialog" title="生成修改页面">生成修改页面</a>
+			            	{/if}
+			            	{if at_exists_strlist('search',$module['func'])}
+								<a href="{at_url('module/gen_search', array('module_id'=>$module['id']))}" class="btn btn-default pull-left" data-dismiss="dialog" title="生成高级查询">生成高级查询</a>
+			            	{/if}
+			            	{if at_exists_strlist('controller',$module['func'])}
+								<a href="{at_url('module/gen_controller', array('module_id'=>$module['id']))}" class="btn btn-default pull-left" data-dismiss="dialog" title="生成控制类">生成控制类</a>
+			            	{/if}
+			            	{if at_exists_strlist('model',$module['func'])}
+								<a href="{at_url('module/gen_model', array('module_id'=>$module['id']))}" class="btn btn-default pull-left" data-dismiss="dialog" title="生成模型类">生成模型类</a>
+			            	{/if}
+			            	<a href="{at_url('module/gen_lang', array('module_id'=>$module['id']))}" class="btn btn-default pull-left" data-dismiss="dialog" title="生成语言类">生成语言类</a>
+			            </td>
+			        </tr>
+			        <tr>
+						<th width="100">预览： </th>
+			            <td class="tm-btns">
+			            	<a href="{at_url($module['class_name'],array(), 'temp')}" class="btn btn-primary pull-left" target="_blank"> 功能预览 </a>
+			            </td>
+			        </tr>
+			        <tr>
+						<th width="100">移到正式环境： </th>
+			            <td class="tm-btns">
+			            	<a href="{at_url('module/move_to_product_env', array('module_id'=>$module['id']))}" class="btn btn-primary pull-left" data-dismiss="dialog" title="移动所有文件">移动所有文件</a>
+			            </td>
+			        </tr>
+
+			        
+				</table>
+
+				<div class="group-footer"></div>
+			</div>
+			<input type="hidden" name="id" value="{$module['id']}"/>
+			</form>
+		</div>
+	</div>
+</div>

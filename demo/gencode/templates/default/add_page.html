@@ -1,0 +1,308 @@
+<div id="page">
+    <div class="page-top">
+        <nav class="navbar navbar-default">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <a class="navbar-brand" href="{at_url('module/module_view', array('id'=>$module['id']))}">{lang('page_title')}[{$module['name']}]</a>
+            </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse">
+              	<ul class="nav navbar-nav">
+	                {if at_exists_strlist('list',$module['func'])}
+	                <li><a href="{at_url('list_page', array('module_id'=>$module['id']))}">列表页面</a></li>
+	                {/if}
+	                {if at_exists_strlist('new',$module['func'])}
+	                <li class="active"><a href="{at_url('add_page', array('module_id'=>$module['id']))}">添加页面</a></li>
+	                {/if}
+	                {if at_exists_strlist('search',$module['func'])}
+	                <li><a href="{at_url('search_page', array('module_id'=>$module['id']))}">高级查询页面</a></li>
+	                {/if}
+	                {if at_exists_strlist('controller',$module['func'])}
+	                <li><a href="{at_url('controller_page', array('module_id'=>$module['id']))}">控制类</a></li>
+	                {/if}
+              	</ul>
+              	<div class="nav-btns pull-right">
+					<a class="btn-icon m-list" title="返回模块列表" href="{at_url('module')}"></a>
+              	</div>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="toolbar clear">
+            <div class="btn-toolbar pull-left">
+                <a href="{at_url('module/gen_add', array('module_id'=>$module['id']))}" class="btn btn-primary pull-left" data-dismiss="dialog">生成页面</a>
+            </div>
+            
+        </div>
+    </div>
+    <div class="page-center">
+		<div class="form-view">
+			<div class="form-group">
+				<div class="group-top"></div>
+				<div class="group-title">基础配置
+					<a class="pull-right btn-icon o-conf" title="基础配置" href="{at_url('add_page/base',array('module_id'=>$module['id']))}" data-post="true" data-dismiss="dialog"></a>
+				</div>
+				<div class="hspace-10">
+				<table width="100%" class="table-form">
+			        <tr>
+			            <th width="100">是否弹出窗口： </th>
+			            <td>
+			            	{if at_array_val($base,'dialog')}
+							<i class="btn-icon o-ok"></i>
+							{else}
+							<i class="btn-icon o-cancel"></i>
+			            	{/if}
+			            </td>
+			        </tr>
+			        <tr>
+			            <th width="100">添加页面模板： </th>
+			            <td>
+			            	{at_array_val($base,'add_template')}
+			            </td>
+			        </tr>
+			        <tr>
+			            <th width="100">编辑页面模板： </th>
+			            <td>
+			            	{at_array_val($base,'edit_template')}
+			            </td>
+			        </tr>
+			        
+			    </table>
+				</div>
+				<!-- 生成标签 -->
+				<?php
+					$this->module_config_model->where(
+							array('module_id'=>$module_id,
+								  'page'=>'add',
+								  'type'=>'tab'))
+						 ->order_by('display_order');
+
+					$tabs = $this->module_config_model->get_data()->result_array();
+					$this->module_config_model->free_result();
+				?>
+				<ul class="nav nav-tabs" id="tabs">
+					{loop $tabs $i $v}
+					<?php $setting = at_string2array($v['setting']); ?>
+	    			<li class="{if $i==0}active{/if}" data-id="{$v['id']}"><a href="#tab{$v['id']}" data-toggle="tab">{$setting['name']}</a>
+	    			</li>
+	    			
+	    			{/loop}
+	    			<li class="{if empty($tabs)}active{/if}"><a href="#tab0" data-toggle="tab">无标签页</a>
+	    			</li>
+					
+					<a id="btn_edit_group" class="btn-icon o-edit pull-right" title="修改分组/分页" href="#"></a>
+					
+					<a id="btn_add_group" class="btn-icon o-plus pull-right" title="增加分组/分页" href="#"></a>
+	    		</ul>
+	    		<div class="tab-content">
+	    			<?php
+	    				if(empty($tabs))
+	    				{
+	    					$tabs = array(array('id'=>0, 'setting'=>''));
+	    				}
+	    				else
+	    				{
+	    					$tabs = array_merge($tabs, array(array('id'=>0, 'setting'=>'')));
+	    				}
+	    			?>
+					{loop $tabs $i $tab}
+					<?php
+						$this->module_config_model->where(
+								array('module_id'=>$module_id,
+									  'page'=>'add',
+									  'type'=>'group',
+									  'pid'=>$tab['id']
+								))
+							 ->order_by('display_order');
+
+						$groups = $this->module_config_model->get_data()->result_array();
+						$this->module_config_model->free_result();
+						if(empty($groups))
+						{
+							$groups = array( array('id'=>$tab['id'], 'setting'=>'') );
+						}
+						else
+						{
+							$groups = array_merge($groups, array(array('id'=>$tab['id'], 'setting'=>'')));
+						}
+					?>
+					
+	    			<div id="tab{$tab['id']}" class="tab-pane {if $i==0}active{/if}">
+	    			{loop $groups $gi $group}
+					<?php
+						if(empty($group['setting']))
+						{
+							$name = "默认组";
+						}
+						else 
+						{
+							$setting = at_string2array($group['setting']);
+							$name = $setting['name'];
+						}
+						$this->module_config_model->where(
+								array('module_id'=>$module_id,
+									  'page'=>'add',
+									  'type'=>'field',
+									  'pid'=>$group['id']
+								))
+							 ->order_by('display_order');
+
+						$form = $this->module_config_model->get_data()->result_array();
+						$this->module_config_model->free_result();
+					?>
+						<div class="group-title">{$name}
+							<a class="pull-right btn btn-primary" title="增加字段" href="{at_url('add_page/field',array('module_id'=>$module['id'],'pid'=>$group['id']))}" data-post="true" data-dismiss="dialog">增加字段</a>
+							<i class="pull-right btn-space"></i>
+							
+							<i class="pull-right btn-space"></i>
+							<a class="pull-right btn-icon o-trash" title="删除分组" href="{at_url('add_page/delete',array('module_id'=>$module['id'],'id'=>$group['id']))}" data-dismiss="delete"></a>
+
+							<a class="pull-right btn-icon o-edit" title="修改分组" href="{at_url('add_page/group',array('module_id'=>$module['id'],'id'=>$group['id']))}" data-post="true" data-dismiss="dialog"></a>
+
+
+
+						</div>
+						<div class="table-list">
+				            {if empty($form)}
+				            <div class="no-data-tip">暂无数据</div>
+				            {else}
+				            <form action="{at_url('add_page/save_order',array('module_id'=>$module['id']))}" method="post">
+				                <table class="table table-hover" width="100%">
+				                    <thead>
+				                        <tr>
+				                            <th width="20" align="right">
+				                                <label class="checkbox">
+				                                    <input type="checkbox" data-name="ids[]">
+				                                </label>
+				                            </th>
+				                            <th width="30" align="center">排序</th>
+		                            		<th width="1" align="left">&nbsp;</th>
+		                            		<th align="center">名称</th>
+				                            <th align="center">字段</th>
+				                            <th align="center">类型</th>
+				                            <th align="left" width="120">
+				                                {lang('action')}
+				                            </th>
+				                        </tr>
+				                    </thead>
+				                    <tbody>
+				                        <?php foreach ($form as $item): ?>
+				                        <?php 
+				                        	$setting = at_string2array($item['setting']);
+				                        ?>
+				                        <tr>
+				                            <td align="right">
+				                                <label class="checkbox">
+				                                    <input type="checkbox" name="ids[]" value="{$item['id']}">
+				                                </label>
+				                            </td>
+				                            <td align="center">
+				                                <input class="form-control displayorder" type="text" name="data[{$item['id']}][display_order]" value="{$item['display_order']}"></td>
+				                            <td align="left">&nbsp;</td>
+				                            <td align="center">{$setting['name']}</td>
+				                            <td align="center">
+												{if $setting['field']=='0'}
+				                            		{at_array_val($setting, 'custom_field')}
+				                            	{else}
+				                            		{$setting['field']}
+				                            	{/if}
+				                            </td>
+				                            <td align="center">{$setting['type']}</td>
+				                            <td align="left" class="action">
+				                                <a class="edit btn-icon o-edit" title="修改" href="{at_url('add_page/field',array('id'=>$item['id'],'module_id'=>$item['module_id']))}" data-post="true" data-dismiss="dialog"></a>
+				                                <a class="del btn-icon o-trash" title="删除" href="{at_url('add_page/delete',array('id'=>$item['id'],'module_id'=>$item['module_id']))}" data-dismiss="delete"></a>
+				                            </td>
+				                        </tr>
+				                        <?php endforeach; ?>
+				                     </tbody>
+				                     <tfoot>   
+				                        <tr class="tr-action">
+				                            <td align="right">
+				                                <label class="checkbox">
+				                                    <input type="checkbox" data-name="ids[]">
+				                                </label>
+				                            </td>
+				                            <td colspan="7" align="left">
+				                                <a class="btn btn-danger btn-sm" href="{at_url('add_page/del_all')}" data-ckname="ids[]" data-dismiss="delete">{lang('delete')}</a>&nbsp;&nbsp;
+				                                <div class="btn-group" id="atb_more">
+				                                    <button class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+				                                        {lang('batch_action')} <i class="caret"></i>
+				                                    </button>
+				                                    <ul class="dropdown-menu">
+				                                        <li>
+				                                            <a href="{at_url('add_page/save_order')}" title="{lang('btn_save_order')}" data-dismiss="ajax-submit" data-valid="false">保存排序</a>
+				                                        </li>
+				                                        <li class="divider"></li>
+														{loop $groups $t_group}
+														<?php
+														if(empty($t_group['setting']))
+														{
+															$gname = "默认组";
+														}
+														else 
+														{
+															$t_setting = at_string2array($t_group['setting']);
+															$gname = $t_setting['name'];
+														}
+														?>
+				                                        <li>
+				                                            <a href="{at_url('add_page/batch_pid', array('pid'=>$t_group['id']))}" title="{lang('btn_set_show')}" data-dismiss="ajax-submit" data-valid="false">
+																{$gname}
+				                                            </a>
+				                                        </li>
+				                                        {/loop}
+				                                    </ul>
+				                                </div>
+				                            </td>
+				                        </tr>
+				                    </tfoot>
+				                </table>
+				            </form>
+				            {/if}
+				        </div>
+				        <div class="group-footer"></div>
+				    {/loop}
+				    </div>
+				    
+				    {/loop}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('.checkbox input').label();
+	$.at.checkbox('ids[]', $('.table-list'));
+	$('#btn_edit_group').click(function(){
+		var id = $('#tabs').find('li.active').data('id');
+		if( id == null ){
+			alert('默认分页不能修改');
+		}
+		else{
+			var href = "{at_url('add_page/group',array('module_id'=>$module['id']))}";
+			href = href + "&id="+id;
+			$.at.dialog({
+				title: '修改分页',
+				url : href,
+				post: true
+			});
+		}
+	});
+	$('#btn_add_group').click(function(){
+		var id = $('#tabs').find('li.active').data('id');
+		if( id == null ){
+			id = 0;
+		}
+		
+		var href = "{at_url('add_page/group',array('module_id'=>$module['id']))}";
+		href = href + "&pid="+id;
+		$.at.dialog({
+			title: '新增标签页',
+			url : href,
+			post: true
+		});
+		
+	});
+});
+
+</script>

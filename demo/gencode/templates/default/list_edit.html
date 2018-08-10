@@ -1,0 +1,114 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+	        <tr>
+	            <th width="100">字段： </th>
+	            <td>
+	            	<select id="filed" name="setting[field]" class="form-control">
+						{loop $fields $name}
+						<?php if($name==$setting['field']):?>
+						<option value="{$name}" selected>{$name}</option>
+						<?php $is_field = true; ?>
+						<?php else: ?>
+						<option value="{$name}">{$name}</option>
+						<?php endif;?>
+						{/loop}
+						<option value="0" {if !isset($is_field)}selected{/if}>自定义</option>
+					</select>
+					<input type="text" id="custom_field" name="setting[custom_field]" class="form-control {if isset($is_field)}hide{/if}" value="{$setting['field']}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">显示名称： </th>
+	            <td>
+	            	<input type="text" name="setting[name]" class="form-control" data-dismiss="validate" data-required="true" value="{$setting['name']}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">显示格式： </th>
+	            <td>
+	            	<select id="format" name="setting[format]" class="form-control">
+	            		<option value="text" {if $setting['format']=='text'}selected{/if}>文本</option>
+	            		<option value="date" {if $setting['format']=='date'}selected{/if}>日期</option>
+	            		<option value="time" {if $setting['format']=='time'}selected{/if}>时间</option>
+	            		<option value="datetime" {if $setting['format']=='datetime'}selected{/if}>日期时间</option>
+						<option value="checkbox" {if $setting['format']=='checkbox'}selected{/if}>checkbox</option>
+						<option value="input" {if $setting['format']=='input'}selected{/if}>文本输入框</option>
+						<option value="a" {if $setting['format']=='a'}selected{/if}>超链接</option>
+						<option value="state" {if $setting['format']=='state'}selected{/if}>状态显示</option>
+					</select>
+	            </td>
+	        </tr>
+	        <tr class="t-url" style="display:none">
+	            <th width="100">URL： </th>
+	            <td>
+	            	<input type="text" name="setting[url]" class="form-control" value="{$setting['url']}">
+	            	<div class="valid-tip"><i class="icon-info-sign"></i>
+						参数:
+	            	</div>
+	            </td>
+	        </tr>
+	        <tr class="t-url" style="display:none">
+	            <th width="100">是否弹出窗口： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" name="setting[dialog]" value="1" {if at_array_val($setting, 'dialog')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+	        <tr class="t-url" style="display:none">
+	            <th width="100">是否提交： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" name="setting[is_post]" value="1" {if at_array_val($setting, 'is_post')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+	        
+			<tr>
+	            <th width="100">排序： </th>
+	            <td>
+	            	<input type="text" name="data[display_order]" class="form-control" data-dismiss="validate" data-number="true" value="{$data['display_order']}">
+	            </td>
+	        </tr>
+	        
+	        
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript">
+$(function(){
+	$('#filed').change(function(){
+		if($(this).val() == '0')
+		{
+			$('#custom_field').removeClass('hide');
+		}
+		else
+		{
+			$('#custom_field').removeClass('hide').addClass('hide');
+			$('#custom_field').val('');
+		}
+	});
+	$('#format').change(function(){
+		if($(this).val() == 'a')
+		{
+			$('.t-url').css('display', '');
+		}
+		else 
+		{
+			$('.t-url').css('display', 'none');
+		}
+	});
+	{if $data['format']=='a'}
+	$('.t-url').css('display', '');
+	{/if}
+});
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>

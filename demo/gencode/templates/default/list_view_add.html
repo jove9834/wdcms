@@ -1,0 +1,62 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+	        <tr>
+	            <th width="100">类型： </th>
+	            <td>
+	            	<select id="r_type" name="setting[type]" class="form-control">
+	            		<option value="url" {if at_array_val($setting, 'type')=='url'}selected{/if}>URL</option>
+	            		<option value="array" {if at_array_val($setting, 'type')=='array'}selected{/if}>一维数组</option>
+	            		<option value="array2" {if at_array_val($setting, 'type')=='array2'}selected{/if}>二维数组</option>
+					</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">URL： </th>
+	            <td>
+	            	<input type="text" name="setting[url]" class="form-control" value="{at_array_val($setting, 'url')}">
+	            	<div class="valid-tip"><i class="icon-info-sign"></i>
+						参数:
+	            	</div>
+	            </td>
+	        </tr>
+	        <tr class="t-url" style="display:{if at_array_val($setting, 'type','url')!='url'}none{/if}">
+	            <th width="100">显示名称： </th>
+	            <td>
+	            	<input type="text" name="setting[name]" class="form-control" value="{at_array_val($setting, 'name')}">
+	            </td>
+	        </tr>
+	        <tr class="t-array t-array2" style="display:{if at_array_val($setting, 'type')=='url'}none{/if}">
+	            <th width="100">数组变量名： </th>
+	            <td>
+	            	<input type="text" name="setting[array]" class="form-control" value="{at_array_val($setting, 'array')}">
+	            </td>
+	        </tr>
+			<tr>
+	            <th width="100">排序： </th>
+	            <td>
+	            	<input type="text" name="data[display_order]" class="form-control" data-dismiss="validate" data-number="true" value="0"  value="{at_array_val($data, 'display_order')}">
+	            </td>
+	        </tr>
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('#r_type').change(function(){
+		var v = $(this).val();
+		$('.t-url').css('display', 'none');
+		$('.t-array').css('display', 'none');
+		$('.t-'+v).css('display', '');
+		
+	});
+
+});
+function at_form_check(){
+	return true;
+}
+</script>

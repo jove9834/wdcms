@@ -1,0 +1,72 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+	        <tr>
+	            <th width="100">模块名称： </th>
+	            <td>
+	            	<input type="text" name="data[name]" class="form-control" data-dismiss="validate" data-required="true" value="{$module['name']}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">控制类名： </th>
+	            <td>
+	            	<input type="text" name="data[class_name]" class="form-control" data-dismiss="validate" data-required="true" value="{$module['class_name']}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">表名： </th>
+	            <td>
+	            	<select id="table_name" name="data[table_name]" style="width:200px">
+						{loop $tables $name}
+						<option value="{$name}" {if $name==$module['table_name']} selected{/if}>{$name}</option>
+						{/loop}
+					</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">应用： </th>
+	            <td>
+	            	<input type="text" name="data[app]" class="form-control" value="{$module['app']}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">文件： </th>
+	            <td>
+	            	<label class="checkbox">
+					<input type="checkbox" id="func_1" name="func[]" value="list" {at_choose(at_exists_strlist('list',$module['func']),'checked')}>列表</label><br/>
+					<label class="checkbox">
+					<input type="checkbox" id="func_2" name="func[]" value="new" {at_choose(at_exists_strlist('new',$module['func']),'checked')}>添加</label><br/>
+					<label class="checkbox">
+					<input type="checkbox" id="func_3" name="func[]" value="edit" {at_choose(at_exists_strlist('edit',$module['func']),'checked')}>修改</label><br/>
+					<label class="checkbox">
+						<input type="checkbox" id="func_4" name="func[]" value="search" {at_choose(at_exists_strlist('search',$module['func']),'checked')}>高级查询
+					</label><br/>
+					<label class="checkbox">
+						<input type="checkbox" id="func_4" name="func[]" value="controller" {at_choose(at_exists_strlist('controller',$module['func']),'checked')}>控制类
+					</label><br/>
+					<label class="checkbox">
+						<input type="checkbox" id="func_4" name="func[]" value="model" {at_choose(at_exists_strlist('model',$module['func']),'checked')}>模型类
+					</label>
+	            </td>
+	        </tr>
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	<input type="hidden" name="id" value="{$module['id']}"/>
+	</form>
+</div>
+<link href="{base_url('assets/css/select2.css')}" type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript" src="{base_url('assets/js/select2.js')}"></script>
+<script type="text/javascript">
+$(function(){
+	$('.checkbox input').label();
+	$("#table_name").select2();
+});
+	
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>

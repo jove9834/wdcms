@@ -1,0 +1,128 @@
+<div id="page">
+    <div class="page-top">
+        <nav class="navbar navbar-default">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <a class="navbar-brand" href="{at_url('module/module_view', array('id'=>$module['id']))}">{lang('page_title')}</a>
+            </div>
+            
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                {if at_exists_strlist('list',$module['func'])}
+                <li><a href="{at_url('list_page', array('module_id'=>$module['id']))}">列表页面</a></li>
+                {/if}
+                {if at_exists_strlist('new',$module['func'])}
+                <li><a href="{at_url('add_page', array('module_id'=>$module['id']))}">添加页面</a></li>
+                {/if}
+                {if at_exists_strlist('search',$module['func'])}
+                <li class="active"><a href="{at_url('search_page', array('module_id'=>$module['id']))}">高级查询页面</a></li>
+                {/if}
+
+              </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="toolbar clear">
+            <div class="btn-toolbar pull-left">
+                <a href="{at_url('module/gen_search', array('module_id'=>$module['id']))}" class="btn btn-primary pull-left" data-dismiss="dialog">生成页面</a>
+            </div>
+            
+        </div>
+    </div>
+    <div class="page-center">
+		<div class="form-view">
+			<div class="form-group">
+				<div class="group-top"></div>
+				<div class="group-title">基础配置
+					<a class="pull-right btn-icon o-conf" title="基础配置" href="{at_url('search_page/base',array('module_id'=>$module['id']))}" data-post="true" data-dismiss="dialog"></a>
+				</div>
+				<div class="hspace-10">
+				<table width="100%" class="table-form">
+			        <tr>
+			            <th width="100">页面模板： </th>
+			            <td>
+			            	{at_array_val($base,'template')}
+			            </td>
+			        </tr>
+			    </table>
+				</div>
+				<div class="group-title">表单
+					<a class="pull-right btn btn-primary" title="增加字段" href="{at_url('search_page/field',array('module_id'=>$module['id']))}" data-post="true" data-dismiss="dialog">增加字段</a>
+				</div>
+				<div class="table-list">
+		            {if empty($fields)}
+		            <div class="no-data-tip">暂无数据</div>
+		            {else}
+		            <form action="{at_url('search_page/save_order',array('module_id'=>$module['id']))}" method="post">
+		                <table class="table table-hover" width="100%">
+		                    <thead>
+		                        <tr>
+		                            <th width="20" align="right">
+		                                <label class="checkbox">
+		                                    <input type="checkbox" data-name="ids[]">
+		                                </label>
+		                            </th>
+		                            <th width="30" align="center">排序</th>
+                            		<th width="1" align="left">&nbsp;</th>
+                            		<th align="center">名称</th>
+		                            <th align="center">字段</th>
+		                            <th align="center">类型</th>
+		                            <th align="left" width="120">
+		                                {lang('action')}
+		                            </th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+		                        <?php foreach ($fields as $item): ?>
+		                        <?php 
+		                        	$setting = at_string2array($item['setting']);
+		                        ?>
+		                        <tr>
+		                            <td align="right">
+		                                <label class="checkbox">
+		                                    <input type="checkbox" name="ids[]" value="{$item['id']}">
+		                                </label>
+		                            </td>
+		                            <td align="center">
+		                                <input class="form-control displayorder" type="text" name="data[{$item['id']}][display_order]" value="{$item['display_order']}"></td>
+		                            <td align="left">&nbsp;</td>
+		                            <td align="center">{$setting['name']}</td>
+		                            <td align="center">{$setting['field']}</td>
+		                            <td align="center">{$setting['type']}</td>
+		                            <td align="left" class="action">
+		                                <a class="edit btn-icon o-edit" title="修改" href="{at_url('search_page/field',array('id'=>$item['id'],'module_id'=>$item['module_id']))}" data-post="true" data-dismiss="dialog"></a>
+		                                <a class="del btn-icon o-trash" title="删除" href="{at_url('search_page/delete',array('id'=>$item['id'],'module_id'=>$item['module_id']))}" data-dismiss="delete"></a>
+		                            </td>
+		                        </tr>
+		                        <?php endforeach; ?>
+		                     </tbody>
+		                     <tfoot>   
+		                        <tr class="tr-action">
+		                            <td align="right">
+		                                <label class="checkbox">
+		                                    <input type="checkbox" data-name="ids[]">
+		                                </label>
+		                            </td>
+		                            <td colspan="7" align="left">
+		                                <a class="btn btn-danger btn-sm" href="{at_url('search_page/del_all')}" data-ckname="ids[]" data-dismiss="delete">{lang('delete')}</a>&nbsp;&nbsp;
+		                                <a class="btn btn-default btn-sm" data-dismiss="ajax-submit" data-valid="false">保存排序</a>
+		                            </td>
+		                        </tr>
+		                    </tfoot>
+		                </table>
+		            </form>
+		            {/if}
+		        </div>
+		        
+				<div class="group-footer"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('.checkbox input').label();
+	$.at.checkbox('ids[]', $('.table-list'));
+});
+
+</script>

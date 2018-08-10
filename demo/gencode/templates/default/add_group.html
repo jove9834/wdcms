@@ -1,0 +1,50 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+			<tr>
+	            <th width="100">类型： </th>
+	            <td>
+	            	<select id="type" name="data[type]" class="form-control">
+	            		<option value="group" {if at_array_val($data, 'type')=='group'}selected{/if}>分组</option>
+	            		<option value="tab" {if at_array_val($data, 'type')=='tab'}selected{/if}>标签页</option>
+					</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">组名称： </th>
+	            <td>
+	            	<input type="text" name="setting[name]" class="form-control" data-dismiss="validate" data-required="true" value="{at_array_val($setting, 'name')}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">所属标签页： </th>
+	            <td>
+	            	<select id="type" name="data[pid]" class="form-control">
+	            		<option value="0" {if at_array_val($data, 'pid')=='0'}selected{/if}>无</option>
+						{loop $tabs $v}
+						<?php $tab_setting = at_string2array($v['setting']);?>
+	            		<option value="{$v['id']}" {if at_array_val($data, 'pid')==$v['id']}selected{/if}>{$tab_setting['name']}</option>
+	            		{/loop}
+					</select>
+	            </td>
+	        </tr>
+			<tr>
+	            <th width="100">排序： </th>
+	            <td>
+	            	<input type="text" name="data[display_order]" class="form-control" data-dismiss="validate" data-number="true"  value="{at_array_val($data, 'display_order','0')}">
+	            </td>
+	        </tr>
+	        
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript">
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>

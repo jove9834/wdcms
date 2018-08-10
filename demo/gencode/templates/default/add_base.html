@@ -1,0 +1,48 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+			<tr>
+	            <th width="100">是否弹出窗口： </th>
+	            <td>
+	            	<label>
+						<input type="checkbox" name="setting[dialog]" value="1" {if at_array_val($data, 'dialog')}checked{/if}/>
+	            	</label>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">添加页面模板： </th>
+	            <td>
+	            	<select name="setting[add_template]" class="form-control">
+						<option value="add-1.php" {if at_array_val($data, 'add_template')=='add-1.php'}selected{/if}>add-1.php</option>
+						<option value="add_div.php" {if at_array_val($data, 'add_template')=='add_div.php'}selected{/if}>add_div.php</option>
+						<option value="add_div_horizontal.php" {if at_array_val($data, 'add_template')=='add_div_horizontal.php'}selected{/if}>add_div_horizontal.php</option>
+	            	</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">编辑页面模板： </th>
+	            <td>
+	            	<select name="setting[edit_template]" class="form-control">
+						<option value="edit-1.php" {if at_array_val($data, 'edit_template')=='edit-1.php'}selected{/if}>edit-1.php</option>
+						<option value="edit_div.php" {if at_array_val($data, 'edit_template')=='edit_div.php'}selected{/if}>edit_div.php</option>
+						<option value="edit_div_horizontal.php" {if at_array_val($data, 'edit_template')=='edit_div_horizontal.php'}selected{/if}>edit_div_horizontal.php</option>
+	            	</select>
+	            </td>
+	        </tr>
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	<input type="hidden" name="id" value="{at_array_val($data, 'id')}"/>
+	</form>
+</div>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript">
+$(function(){
+	$('.checkbox input').label();
+});
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>

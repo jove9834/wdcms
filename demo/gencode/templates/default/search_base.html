@@ -1,0 +1,25 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+	        <tr>
+	            <th width="100">页面模板： </th>
+	            <td>
+	            	<select name="setting[template]" class="form-control">
+						<option value="search.php" {if at_array_val($data, 'template')=='search.php'}selected{/if}>search.php</option>
+						<option value="search_div.php" {if at_array_val($data, 'template')=='search_div.php'}selected{/if}>search_div.php</option>
+	            	</select>
+	            </td>
+	        </tr>
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	<input type="hidden" name="id" value="{at_array_val($data, 'id')}"/>
+	</form>
+</div>
+<script type="text/javascript">
+function at_form_check(){
+	return true;
+}
+</script>

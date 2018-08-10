@@ -1,0 +1,90 @@
+<div id="page">
+    <div class="page-top bottom-line">
+        <nav class="navbar navbar-default">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">{lang('page_title')}</a>
+            </div>
+        </nav>
+        <div class="toolbar clear">
+            <div class="btn-toolbar pull-left">
+                <a href="{at_url('module/module_new')}" class="btn btn-primary pull-left" data-post="true" data-dismiss="dialog" title="{lang('add')}">{lang('add')}</a>
+                
+            </div>
+        </div>
+    </div>
+    <div class="page-center">
+        <div class="table-list">
+            {if empty($lists)}
+            <div class="no-data-tip">暂无数据</div>
+            {else}
+            <form action="" method="post" name="myform" id="myform">
+                <input name="action" id="action" type="hidden" value="order">
+                <table class="table table-hover" id="table_list" width="100%">
+                    <thead>
+                        <tr>
+                            <th width="20" align="right">
+                                <label class="checkbox">
+                                    <input type="checkbox" data-name="ids[]">
+                                </label>
+                            </th>
+                            <th align="left">模块名称</th>
+                            <th align="left">控制类</th>
+                            <th align="left">应用</th>
+                            <th align="center">状态</th>
+                            <th align="center">创建时间</th>
+                            <th align="left" width="140">
+                                {lang('action')}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($lists as $item): ?>
+                        <tr>
+                            <td align="right">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="ids[]" value="{$item['id']}">
+                                </label>
+                            </td>
+                            <td>{$item['name']}</td>
+                            <td>{$item['class_name']}</td>
+                            <td>{$item['app']}</td>
+                            <td align="center">{$item['status']==0?'未生成':'已生成'}</td>
+                            <td align="center">{$item['ctime'] format:datetime}</td>
+                            <td align="left" class="action">
+
+                                <a class="edit btn-icon o-conf" title="生成" href="{at_url('module/module_view',array('id'=>$item['id']))}"></a>
+                                <a class="edit btn-icon o-edit" title="修改" href="{at_url('module/module_edit',array('id'=>$item['id']))}" data-post="true" data-dismiss="dialog"></a>
+                                <a class="del btn-icon o-trash" title="删除" href="{at_url('module/module_del',array('id'=>$item['id']))}" data-dismiss="delete"></a>
+                                {if $item['status']==1}
+                                <a class="del btn-icon o-view" title="预览" href="{at_url($item['class_name'],array(),'temp')}"></a>
+                                {/if}
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                     </tbody>
+                     <tfoot>   
+                        <tr class="tr-action">
+                            <td align="right">
+                                <label class="checkbox">
+                                    <input type="checkbox" data-name="ids[]">
+                                </label>
+                            </td>
+                            <td colspan="7" align="left">
+                                <a class="btn btn-danger btn-sm pull-left" href="{at_url('module/module_del_all')}" data-ckname="ids[]" data-dismiss="delete">{lang('delete')}</a>
+                                <div id="pages" class="pull-right">{$pages}</div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </form>
+            
+            {/if}
+        </div>
+    </div>
+</div>
+<script>
+$(function(){
+    $.at.checkbox('ids[]', $('.table-list')); 
+})
+</script>

@@ -1,0 +1,42 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+			<tr>
+	            <th>字段： </th>
+	            <td>
+	            	<select id="filed" name="setting[field]" class="form-control">
+						{loop $fields $name}
+						<option value="{$name}" {if at_array_val($setting, 'field')==$name}selected{/if}>{$name}</option>
+						{/loop}
+					</select>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">默认值： </th>
+	            <td>
+	            	<input type="text" name="setting[value]" class="form-control" value="{at_array_val($setting, 'value')}">
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">排序： </th>
+	            <td>
+	            	<input type="text" name="data[display_order]" class="form-control" data-dismiss="validate" data-number="true"  value="{at_array_val($data, 'display_order','0')}">
+	            </td>
+	        </tr>
+	        
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript">
+$(function(){
+
+});
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>

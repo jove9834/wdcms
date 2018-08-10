@@ -1,0 +1,93 @@
+<div class="form-view">
+	<form id="my_form">
+	<div class="form-group">
+		<div class="group-top"></div>
+		<table width="100%" class="table-form">
+	        <tr>
+	            <th width="100">按钮组： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" id="is_group" name="data[is_group]" value="1" {if at_array_val($data, 'is_group')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">显示名称： </th>
+	            <td>
+	            	<input type="text" name="setting[name]" class="form-control" data-dismiss="validate" data-required="true" value="{at_array_val($setting, 'name')}">
+	            </td>
+	        </tr>
+	        <tr class="t-btn">
+	            <th width="100">所属组： </th>
+	            <td>
+	            	<select name="data[pid]" class="form-control">
+	            		<option value="0">无</option>
+	            		{loop $groups $item}
+	            		<?php 
+                        	$setting2 = at_string2array($item['setting']);
+                        ?>
+						<option value="{$item['id']}" {if at_array_val($data, 'pid')==$item['id']}selected{/if}>{$setting2['name']}</option>
+	            		{/loop}
+	            	</select>
+	            </td>
+	        </tr>
+	        <tr class="t-btn">
+	            <th width="100">样式： </th>
+	            <td>
+	            	<input type="text" name="setting[cssclass]" class="form-control"  value="{at_array_val($setting, 'cssclass', 'btn btn-default')}" >
+	            </td>
+	        </tr>
+	        <tr class="t-btn">
+	            <th width="100">URL： </th>
+	            <td>
+	            	<input type="text" name="setting[url]" class="form-control" value="{at_array_val($setting, 'url')}">
+	            </td>
+	        </tr>
+	        <tr class="t-btn">
+	            <th width="100">是否弹出窗口： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" name="setting[dialog]" value="1" {if at_array_val($setting, 'dialog')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+	        <tr class="t-btn">
+	            <th width="100">是否提交： </th>
+	            <td>
+	            	<label class="checkbox">
+						<input type="checkbox" name="setting[is_post]" value="1" {if at_array_val($setting, 'is_post')}checked{/if}>
+	            	</label>
+	            </td>
+	        </tr>
+	        <tr>
+	            <th width="100">排序： </th>
+	            <td>
+	            	<input type="text" name="data[display_order]" class="form-control" data-dismiss="validate" data-number="true"  value="{at_array_val($data, 'display_order','0')}">
+	            </td>
+	        </tr>
+	        
+	        
+		</table>
+		<div class="group-footer"></div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript" src="{base_url('assets/js/validate.js')}"></script>
+<script type="text/javascript">
+$(function(){
+	$('.checkbox input').label();
+	$('#is_group').change(function(){
+		if($(this).is(':checked'))
+		{
+			$('.t-btn').css('display', 'none');
+		}
+		else 
+		{
+			$('.t-btn').css('display', '');
+		}
+	})
+});
+function at_form_check(){
+	return $('#my_form').validateForm().check();
+}
+</script>
