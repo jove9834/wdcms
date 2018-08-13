@@ -60,4 +60,20 @@ return [
     'break_reconnect' => false,
     // 断线标识字符串
     'break_match_str' => [],
+//    'gencode' => [
+//        // 数据库类型
+//        'type'            => 'mysql',
+//        // 服务器地址
+//        'hostname'        => 'dev.wdeip.com',
+//        // 数据库名
+//        'database'        => 'gencode',
+//        // 用户名
+//        'username'        => 'u_gencode',
+//        // 密码
+//        'password'        => 'cspszGpGZ9H2sCBe',
+//        // 数据库编码默认采用utf8
+//        'charset'         => 'utf8',
+//        // 数据库表前缀
+//        'prefix'          => 'gen_',
+//    ]
 ];
