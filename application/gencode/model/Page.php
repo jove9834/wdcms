@@ -11,7 +11,11 @@ class Page extends Model
      * @var string
      */
     protected $autoWriteTimestamp = 'datetime';
-
+    /**
+     * 别名属性
+     *
+     * @var array
+     */
     protected $append = ['func_text'];
 
     /**
@@ -37,5 +41,22 @@ class Page extends Model
         }
 
         return implode(', ', $ret);
+    }
+
+    /**
+     * 数组转换为以逗号分隔的字符串
+     * @param mixed $value 值
+     * @return string
+     */
+    public function setFuncAttr($value) {
+        if (!$value) {
+            return '';
+        }
+
+        if (is_array($value)) {
+            $value = implode(',', $value);
+        }
+
+        return $value;
     }
 }

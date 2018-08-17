@@ -9,11 +9,19 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+use think\facade\Route;
+
 Route::get('think', function () {
     return 'hello,ThinkPHP5!';
 });
 
 Route::get('hello/:name', 'index/hello');
+
+Route::group('gencode', function () {
+    Route::resource('page', 'gencode/page');
+    Route::get('page/tables', 'gencode/page/tables');
+    Route::get('page/fields/:id', 'gencode/page/fields');
+});
 
 return [
 
