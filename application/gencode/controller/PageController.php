@@ -6,6 +6,7 @@ namespace app\gencode\controller;
 
 use app\gencode\model\Page;
 use think\Db;
+use think\db\Query;
 use think\Request;
 
 class PageController
@@ -79,6 +80,7 @@ class PageController
      *
      * @param int $id ID
      * @return \think\Response
+     * @throws \Exception
      */
     public function delete($id)
     {
@@ -123,6 +125,8 @@ class PageController
             return responseErrorJson('无效参数');
         }
 
+
+
         /** @var \think\db\Query $query*/
         try {
             $row = Page::get($id);
@@ -130,8 +134,14 @@ class PageController
                 return responseErrorJson('记录不存在');
             }
 
-            $fields = $row->getConnection()->getTableInfo($row->getTable());
-            return responseDataJson($fields);
+            $sql = "select * from information_schema.columns where table_schema = 'gencode' and table_name = 'gen_page'";
+            /** @var Query $query */
+            $query = Db::connect($row['connection']);
+            $ret = $query->query($sql);
+            var_dump($ret);
+
+//            $fields = $row->getConnection()->getTableInfo($row->getTable());
+//            return responseDataJson($fields);
         } catch (\Exception $e) {
             return responseErrorJson($e->getMessage());
         }
