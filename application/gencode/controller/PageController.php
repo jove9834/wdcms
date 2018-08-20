@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * 功能页面接口
  */
 namespace app\gencode\controller;
 
@@ -119,29 +119,49 @@ class PageController
         }
     }
 
+    /**
+     * 取表字段信息
+     *
+     * @param integer $id Page ID
+     * @return \think\response\Json
+     */
     public function fields($id) {
         $id = intval($id);
         if (!$id) {
             return responseErrorJson('无效参数');
         }
 
-
-
-        /** @var \think\db\Query $query*/
         try {
             $row = Page::get($id);
             if (!$row) {
                 return responseErrorJson('记录不存在');
             }
 
-            $sql = "select * from information_schema.columns where table_schema = 'gencode' and table_name = 'gen_page'";
+            $sql = 'select * from information_schema.columns where table_schema=:dbname and table_name=:tableName';
             /** @var Query $query */
             $query = Db::connect($row['connection']);
-            $ret = $query->query($sql);
-            var_dump($ret);
+            $bind = array(
+                'dbname' => $query->getConfig('database'),
+                'tableName' => $query->getConfig('prefix') . $row['table']
+            );
 
-//            $fields = $row->getConnection()->getTableInfo($row->getTable());
-//            return responseDataJson($fields);
+            $rows = $query->query($sql, $bind);
+            $fields = [];
+            if ($rows) {
+                foreach ($rows as $item) {
+                    $fields[] = [
+                        'name' => $item['COLUMN_NAME'],
+                        'type' => $item['DATA_TYPE'],
+                        'max_length' => $item['CHARACTER_MAXIMUM_LENGTH'],
+                        'comment' => $item['COLUMN_COMMENT'],
+                        'nullable' => $item['IS_NULLABLE'] === 'YES',
+                        'default' => $item['COLUMN_DEFAULT'],
+                        'is_pri' => $item['COLUMN_KEY'] === 'PRI',
+                    ];
+                }
+            }
+
+            return responseDataJson($fields);
         } catch (\Exception $e) {
             return responseErrorJson($e->getMessage());
         }
