@@ -6,6 +6,21 @@ use think\Model;
 class Edit extends Model
 {
     /**
+     * 组件
+     */
+    const COMPONENTS = [
+        'text' => '文本框',
+        'textarea' => '多行文本框',
+        'password' => '密码框',
+        'select' => '下拉框',
+        'radio' => '单选框',
+        'checkbox' => '复选框',
+        'date' => '日期选择',
+        'datetime' => '日期时间选择',
+        'daterange' => '日期范围选择',
+    ];
+
+    /**
      * 默认的创建时间字段为create_time，更新时间字段为update_time
      *
      * @var string
