@@ -14,7 +14,9 @@ class BuildController
     /**
      * 生成代码
      *
-     * @return \think\Response
+     * @param integer $id
+     * @param string  $name
+     * @return void
      */
     public function index($id, $name = '')
     {

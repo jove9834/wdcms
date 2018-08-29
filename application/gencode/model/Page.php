@@ -3,6 +3,11 @@ namespace app\gencode\model;
 
 use think\Model;
 
+/**
+ * Class Page
+ *
+ * @package app\gencode\model
+ */
 class Page extends Model
 {
     /**
