@@ -56,8 +56,9 @@ class Build
         $fields = [];
         if ($rows) {
             foreach ($rows as $item) {
-                $fields[] = [
-                    'name' => $item['COLUMN_NAME'],
+                $name = $item['COLUMN_NAME'];
+                $fields[$name] = [
+                    'name' => $name,
                     'type' => $item['DATA_TYPE'],
                     'max_length' => $item['CHARACTER_MAXIMUM_LENGTH'],
                     'comment' => $item['COLUMN_COMMENT'],

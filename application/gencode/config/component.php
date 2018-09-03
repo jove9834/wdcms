@@ -15,7 +15,7 @@ return [
     'textarea' => [
         'name' => '多行文本框',
         'attributes' => [
-            'rows' => '行数',
+            'rows' => ['name' => '行数', 'value' => 5],
         ]
     ],
     'password' => [
@@ -27,40 +27,28 @@ return [
     'select' => [
         'name' => '下拉框',
         'attributes' => [
+            'type' => ['name' => '类型', 'options' => ['normal', 'dict']],
             'options' => '选项',
-            'width' => '宽',
-        ]
-    ],
-    'selectDict' => [
-        'name' => '下拉框(字典)',
-        'type' => [
-            'options' => [
-
-            ],
-            'dict' => ''
-        ],
-        'attributes' => [
-            'dict' => '字典',
             'width' => '宽',
         ]
     ],
     'radio' => [
         'name' => '单选框',
         'attributes' => [
-            'dict' => '字典'
+            'type' => ['name' => '类型', 'options' => ['normal', 'dict']],
+            'options' => '选项',
         ]
     ],
     'checkbox' => [
         'name' => '复选框',
         'attributes' => [
-            'dict' => '字典'
+            'type' => ['name' => '类型', 'options' => ['normal', 'dict']],
+            'options' => '选项',
         ]
     ],
     'date' => [
         'name' => '日期选择',
-        'attributes' => [
-            'format' => '格式'
-        ]
+        'attributes' => []
     ],
     'datetime' => '日期时间选择',
     'daterange' => '日期范围选择',

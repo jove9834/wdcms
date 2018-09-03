@@ -6,21 +6,6 @@ use think\Model;
 class Edit extends Model
 {
     /**
-     * 组件
-     */
-    const COMPONENTS = [
-        'text' => '文本框',
-        'textarea' => '多行文本框',
-        'password' => '密码框',
-        'select' => '下拉框',
-        'radio' => '单选框',
-        'checkbox' => '复选框',
-        'date' => '日期选择',
-        'datetime' => '日期时间选择',
-        'daterange' => '日期范围选择',
-    ];
-
-    /**
      * 默认的创建时间字段为create_time，更新时间字段为update_time
      *
      * @var string
@@ -31,47 +16,51 @@ class Edit extends Model
      *
      * @var array
      */
-    protected $append = ['func_text'];
+    protected $append = ['component_name', 'attribute_text'];
 
     /**
-     * 功能
+     * 组件名称
      *
-     * @param string $value 功能值
+     * @param string $value value
      * @param mixed  $data  行数据
      * @return string
      */
-    public function getFuncTextAttr($value, $data)
+    public function getComponentNameAttr($value, $data)
     {
-        if (!$data['func']) {
+        if (!$data['component']) {
             return '';
         }
 
-        $func = [1 => '多选功能', 2 => '查询条件', 3 => '添加', 4 => '修改', 5 => '删除'];
-        $arr = explode(',', $data['func']);
-        $ret = [];
-        foreach ($arr as $item) {
-            if (isset($func[$item])) {
-                $ret[] = $func[$item];
-            }
-        }
+        $components = config('component');
 
-        return implode(', ', $ret);
+        return $components[$data['component']];
     }
 
     /**
-     * 数组转换为以逗号分隔的字符串
-     * @param mixed $value 值
+     * 组件属性名称
+     *
+     * @param string $value value
+     * @param mixed  $data  行数据
      * @return string
      */
-    public function setFuncAttr($value) {
-        if (!$value) {
+    public function getAttributeTextAttr($value, $data)
+    {
+        if (!$data['attribute']) {
             return '';
         }
 
-        if (is_array($value)) {
-            $value = implode(',', $value);
+        $attribute = json_decode($data['attribute'], TRUE);
+        $ret = [];
+        foreach ($attribute as $name => $value) {
+            if (is_bool($value)) {
+                $ret[] = $name;
+            } else if (is_array($value)) {
+                $ret[] = sprintf('%s: %s', $name, implode(', ', $value));
+            } else {
+                $ret[] = sprintf('%s: %s', $name, $value);
+            }
         }
 
-        return $value;
+        return implode('|', $ret);
     }
 }

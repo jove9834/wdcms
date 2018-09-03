@@ -1,17 +1,18 @@
 <?php
 /**
- * 字段配置接口
+ * 编辑页面配置接口
  */
 namespace app\gencode\controller;
 
 use app\gencode\common\Build;
+use app\gencode\model\Edit;
 use app\gencode\model\Field;
 use app\gencode\model\Page;
 use think\Db;
 use think\db\Query;
 use think\Request;
 
-class FieldController
+class EditController
 {
     /**
      * 取Page列表
@@ -34,7 +35,8 @@ class FieldController
             // 取表字段定义
             $tableFields = Build::getTableFields($page['connection'], $page['table']);
             // 取字段
-            $fields = Field::where('page_id', $page_id)->select();
+            $fieldConfig = Field::where('page_id', $page_id)->select();
+            $fields = Edit::where('page_id', $page_id)->select();
             $fieldNames = array_column($fields, 'id', 'name');
             $insertData = [];
             foreach ($tableFields as $item) {
@@ -51,12 +53,12 @@ class FieldController
                 }
             }
 
-            $field = new Field();
+            $field = new Edit();
             if ($insertData) {
                 $field->saveAll($insertData);
             }
 
-            $fields = Field::where('page_id', $page_id)->select();
+            $fields = Edit::where('page_id', $page_id)->select();
             // 已删除的字段
             $updateData = [];
             foreach ($fields as $item) {
@@ -70,7 +72,7 @@ class FieldController
                 $field->saveAll($updateData);
             }
 
-            $fields = Field::where('page_id', '=', $page_id)->where('status', 1)->select();
+            $fields = Edit::where('page_id', $page_id)->where('status', 1)->select();
             foreach ($fields as &$item) {
                 if (isset($tableFields[$item['name']])) {
                     $tableField = $tableFields[$item['name']];

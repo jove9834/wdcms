@@ -7,6 +7,7 @@ namespace app\gencode\controller;
 use app\gencode\model\Page;
 use think\Db;
 use think\db\Query;
+use think\facade\App;
 use think\Request;
 
 class PageController
@@ -18,8 +19,8 @@ class PageController
      */
     public function index()
     {
-//        $a = App::config();
-//        var_dump($a);
+        $a = App::config();
+        var_dump($a);
 //        echo App::getModulePath();
         // 查询状态为1的用户数据 并且每页显示10条数据
         try {
