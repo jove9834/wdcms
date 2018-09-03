@@ -14,7 +14,7 @@ class BuildController
     /**
      * 生成代码
      *
-     * @param integer $id
+     * @param integer $id   page表中ID
      * @param string  $name
      * @return void
      */

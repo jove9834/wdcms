@@ -1,31 +1,63 @@
 <?php
 /**
- * 功能页面接口
+ * 字段配置接口
  */
 namespace app\gencode\controller;
 
+use app\gencode\common\Build;
+use app\gencode\model\Field;
 use app\gencode\model\Page;
 use think\Db;
 use think\db\Query;
 use think\Request;
 
-class PageController
+class FieldController
 {
     /**
      * 取Page列表
      *
+     * @param integer $page_id 页面ID
      * @return \think\Response
      */
-    public function index()
+    public function index($page_id)
     {
-//        $a = App::config();
-//        var_dump($a);
-//        echo App::getModulePath();
-        // 查询状态为1的用户数据 并且每页显示10条数据
+        if (!$page_id) {
+            return responseErrorJson('参数不正确');
+        }
+
         try {
-            $list = Page::paginate(10);
-            $json = $list->render();
-            return responseDataJson($json);
+            $page = Page::get($page_id);
+            if (!$page) {
+                return responseErrorJson('page不存在');
+            }
+
+            // 取表字段定义
+            $tableFields = Build::getTableFields($page['connection'], $page['table']);
+            // 取字段
+            $fields = Field::where('page_id', '=', $page_id)->select();
+            if ($fields->isEmpty()) {
+                // 初始化field表
+                $insertData = [];
+                foreach ($tableFields as $field) {
+                    $insertData[] = [
+                        'page_id' => $page_id,
+                        'name' => $field['name'],
+                        'title' => $field['comment'],
+                        'default_value' => $field['default'],
+                        'update_time' => date('Y-m-d H:i:s'),
+                    ];
+                }
+                $field = new Field();
+                $field->saveAll($insertData);
+
+                $fields = Field::where('page_id', '=', $page_id)->select();
+            } else {
+                // TODO::验证表结构是否修改
+
+            }
+
+            // 返回
+            return responseDataJson($fields);
         } catch (\Exception $e) {
             return responseErrorJson($e->getMessage());
         }
@@ -129,54 +161,6 @@ class PageController
             $query = Db::connect($conn);
             $tables = $query->getConnection()->getTables($query->getConfig('database'));
             return responseDataJson($tables);
-        } catch (\Exception $e) {
-            return responseErrorJson($e->getMessage());
-        }
-    }
-
-    /**
-     * 取表字段信息
-     *
-     * @param integer $id Page ID
-     * @return \think\response\Json
-     */
-    public function fields($id) {
-        $id = intval($id);
-        if (!$id) {
-            return responseErrorJson('无效参数');
-        }
-
-        try {
-            $row = Page::get($id);
-            if (!$row) {
-                return responseErrorJson('记录不存在');
-            }
-
-            $sql = 'select * from information_schema.columns where table_schema=:dbname and table_name=:tableName';
-            /** @var Query $query */
-            $query = Db::connect($row['connection']);
-            $bind = array(
-                'dbname' => $query->getConfig('database'),
-                'tableName' => $query->getConfig('prefix') . $row['table']
-            );
-
-            $rows = $query->query($sql, $bind);
-            $fields = [];
-            if ($rows) {
-                foreach ($rows as $item) {
-                    $fields[] = [
-                        'name' => $item['COLUMN_NAME'],
-                        'type' => $item['DATA_TYPE'],
-                        'max_length' => $item['CHARACTER_MAXIMUM_LENGTH'],
-                        'comment' => $item['COLUMN_COMMENT'],
-                        'nullable' => $item['IS_NULLABLE'] === 'YES',
-                        'default' => $item['COLUMN_DEFAULT'],
-                        'is_pri' => $item['COLUMN_KEY'] === 'PRI',
-                    ];
-                }
-            }
-
-            return responseDataJson($fields);
         } catch (\Exception $e) {
             return responseErrorJson($e->getMessage());
         }

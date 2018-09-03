@@ -21,6 +21,7 @@ Route::group('gencode', function () {
     Route::resource('page', 'gencode/page');
     Route::get('page/tables', 'gencode/page/tables');
     Route::get('page/fields/:id', 'gencode/page/fields');
+    Route::resource('page.field', 'gencode/field');
 });
 
 return [
