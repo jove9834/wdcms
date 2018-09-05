@@ -10,12 +10,12 @@
 // +----------------------------------------------------------------------
 namespace app\gencode;
 
+use app\gencode\common\Build;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
-use think\facade\App;
 
 class Generate extends Command
 {
@@ -26,7 +26,7 @@ class Generate extends Command
             ->addOption('module', 'm', Option::VALUE_OPTIONAL,
                 '所属模块名称', 'index')
             ->addOption('conn', 'c', Option::VALUE_OPTIONAL,
-                '数据库连接', 'default')
+                '数据库连接', '')
             ->addOption('template', 't', Option::VALUE_OPTIONAL,
                 '生成代码模板，默认EIP', 'EIP')
             ->addOption('code', 'C', Option::VALUE_OPTIONAL,
@@ -43,18 +43,24 @@ class Generate extends Command
         $code = $input->getOption('code');
         $table = trim($input->getArgument('table'));
 
-        if ($code === 'config') {
-            // 生成配置文件
-        } else {
-            // 生成其他功能代码
-        }
+        try {
+            if ($code === 'config') {
+                // 生成配置文件
+                $fileName = Build::makeConfig($module, $conn, $table);
+            } else {
+                // 生成其他功能代码
+                $fileName = '';
+            }
 
-        $output->writeln(sprintf('module: %s', $module));
-        $output->writeln(sprintf('table: %s', $table));
-        $output->writeln(sprintf('connection: %s', $conn));
-        $output->writeln(sprintf('template: %s', $template));
-        $output->writeln(sprintf('code: %s', $code));
-        // passthru($command);
+            $output->writeln(sprintf('module: %s', $module));
+            $output->writeln(sprintf('table: %s', $table));
+            $output->writeln(sprintf('connection: %s', $conn));
+            $output->writeln(sprintf('template: %s', $template));
+            $output->writeln(sprintf('code: %s', $code));
+            $output->writeln(sprintf('generate file: %s', $fileName));
+        } catch (\Exception $e) {
+            $output->renderException($e);
+        }
     }
 
 }
