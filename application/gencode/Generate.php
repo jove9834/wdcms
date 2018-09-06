@@ -11,6 +11,8 @@
 namespace app\gencode;
 
 use app\gencode\common\Build;
+use app\gencode\common\make\Config;
+use app\gencode\common\make\Controller;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Argument;
@@ -28,7 +30,7 @@ class Generate extends Command
             ->addOption('conn', 'c', Option::VALUE_OPTIONAL,
                 '数据库连接', '')
             ->addOption('template', 't', Option::VALUE_OPTIONAL,
-                '生成代码模板，默认EIP', 'EIP')
+                '生成代码模板，默认EIP', 'default')
             ->addOption('code', 'C', Option::VALUE_OPTIONAL,
                 '生成代码部分， model, controller, view, config')
             ->addArgument('table', Argument::REQUIRED,'表名')
@@ -46,10 +48,13 @@ class Generate extends Command
         try {
             if ($code === 'config') {
                 // 生成配置文件
-                $fileName = Build::makeConfig($module, $conn, $table);
-            } else {
+                $makeConfig = new Config();
+                $fileName = $makeConfig->make($module, $conn, $table);
+            } elseif ($code === 'controller') {
+                $config = Build::getConfig($module, $table);
                 // 生成其他功能代码
-                $fileName = '';
+                $makeController = new Controller($config, $template, $module);
+                $fileName = $makeController->make();
             }
 
             $output->writeln(sprintf('module: %s', $module));

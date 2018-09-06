@@ -9,6 +9,7 @@
 namespace app\gencode\common;
 
 
+use app\common\Http;
 use think\Container;
 use think\Db;
 use think\db\Query;
@@ -16,11 +17,6 @@ use think\facade\Log;
 
 class Build
 {
-    public static function getConfig($id) {
-        $config = [];
-        return $config;
-    }
-
     /**
      * 生成代码
      *
@@ -75,48 +71,23 @@ class Build
         return $fields;
     }
 
-    /**
-     * 生成配置文件内容
-     *
-     * @param $module
-     * @param $connection
-     * @param $table
-     * @return string 生成的文件名
-     * @throws \Exception
-     */
-    public static function makeConfig($module, $connection, $table) {
-        $fields = self::getTableFields($connection, $table);
-        $config = [
-            'connection' => $connection,
-            'table' => $table,
-            'title' => $table,
-            'batch' => true, // 批量操作
-            'function' => 'add,edit,delete,detail,export',
-            'fields' => [],
-            'form' => [],
-            'search' => [],
-            'list' => [],
-        ];
-
-        $form = [];
-        foreach ($fields as $field) {
-            $config['fields'][$field['name']] = self::getFieldConfig($field);
-            $config['list'][$field['name']] = self::getColumnConfig($field);
-            if (!$field['is_pri'] || $field['name'] === 'create_time' || $field['name'] === 'update_time') {
-                $form[] = $field['name'];
-            }
+    public static function getConfigFile($module, $table) {
+        $fileName = $table . '.php';
+        $pathname = Container::get('app')->getRuntimePath() . 'gencode' .DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $fileName;
+        if (!file_exists($pathname)) {
+            throw new \Exception('配置文件不存在');
         }
 
-        $config['form']['default'] = implode(',', $form);
-
-        $content = "<?php\r\nreturn ".var_export($config,TRUE).";\r\n";
-        $fileName = self::getTableName($connection, $table) . '.php';
-
-        self::writeFile($module, $fileName, $content);
-        return $fileName;
+        return $pathname;
     }
 
-    private static function getTableName($connection, $table) {
+    public static function getConfig($module, $table) {
+        $configFile = self::getConfigFile($module, $table);
+        return include_once $configFile;
+    }
+
+
+    public static function getTableName($connection, $table) {
         $config = Db::getConfig($connection);
         $prefix = $config['prefix'];
         if (substr($table, 0, strlen($prefix)) === $prefix) {
@@ -133,7 +104,7 @@ class Build
      * @param $fileName
      * @param $content
      */
-    private static function writeFile($module, $fileName, $content) {
+    public static function writeFile($module, $fileName, $content) {
         $pathname = Container::get('app')->getRuntimePath() . 'gencode' .DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $fileName;
 
         if (!is_dir(dirname($pathname))) {
@@ -143,131 +114,44 @@ class Build
         file_put_contents($pathname, $content);
     }
 
-    /**
-     * 取字段配置信息
-     *
-     * @param array $fieldInfo 字段结构
-     * @return array
-     */
-    private static function getFieldConfig(array $fieldInfo) {
-        $fieldConfig = [
-            'title' => $fieldInfo['comment'] ? $fieldInfo['comment'] : $fieldInfo['name'],
-            'type' => $fieldInfo['type'],
-            'max_length' => $fieldInfo['max_length'],
-            'nullable' => $fieldInfo['nullable'],
-            'default' => $fieldInfo['default'],
-        ];
 
-        $rule = [];
-        if (!$fieldInfo['nullable']) {
-            $rule[] = 'require';
-        }
-
-        $component = 'text';
-        switch ($fieldInfo['type']) {
-            case 'varchar':
-                $rule[] = sprintf('max:%d', $fieldInfo['max_length']);
-                break;
-            case 'int':
-            case 'tinyint':
-            case 'smallint':
-            case 'bigint':
-                $rule[] = 'integer';
-                break;
-            case 'decimal':
-                $rule[] = 'number';
-                break;
-            case 'date':
-                $rule[] = 'date';
-                $component = 'date';
-                break;
-            case 'datetime':
-                $rule[] = 'date';
-                $component = 'datetime';
-                break;
-            case 'text':
-                $component = 'textarea';
-                break;
-        }
-
-        if ($fieldInfo['is_pri']) {
-            $component = 'hidden';
-        }
-
-
-
-        $fieldConfig['validate'] = $rule ? implode('|', $rule) : NULL;
-        $fieldConfig['component'] = $component;
-        $fieldConfig['attribute'] = self::getComponentAttribute($component, $fieldInfo['max_length']);
-
-        if ($fieldInfo['name'] === 'create_time' || $fieldInfo['name'] === 'update_time') {
-            $fieldConfig['add_status'] = 'hide';
-            $fieldConfig['edit_status'] = 'hide';
-        }
-
-        return $fieldConfig;
-    }
 
     /**
-     * 取字段的组件默认属性
+     * 格式化代码
      *
-     * @param string $component 组件名
-     * @param string $maxLength 字段最大长度
-     * @return array
+     * @param string $code php代码
+     * @return string
+     * @throws \Exception
      */
-    private static function getComponentAttribute($component, $maxLength) {
-        $attribute = [];
-        if ($component === 'text' && $maxLength) {
-            $attribute['maxlength'] = $maxLength;
-        } elseif ($component === 'textarea') {
-            if ($maxLength) {
-                $attribute['maxlength'] = $maxLength;
-            }
+    public static function formatPhpCode($code) {
+        $params = array(
+            'spaces_around_map_operator' => 'on',
+            'spaces_around_assignment_operators' => 'on',
+            'spaces_around_bitwise_operators' => 'on',
+            'spaces_around_relational_operators' => 'on',
+            'spaces_around_equality_operators' => 'on',
+            'spaces_around_logical_operators' => 'on',
+            'spaces_around_math_operators' => 'on',
+            'space_after_structures' => 'on',
+            'align_assignments' => 'on',
+            'indent_case_default' => 'on',
+            'indent_number' => '4',
+            'first_indent_number' => '0',
+            'indent_char' => ' ',
+            'indent_style' => 'K&R',
+            'code' => $code
+        );
 
-            $attribute['rows'] = 5;
+        $res = Http::post(
+            'http://www.phpformatter.com/Output/',
+            $params
+        );
+
+        $res = json_decode($res, TRUE);
+        if (! $res["error"]) {
+            return $res['plainoutput'];
+        } else {
+            return sprintf('Error on line %d: %s!', $res['line'], $res['text']);
         }
-
-        return $attribute;
-    }
-
-    /**
-     * 取列表列字段配置
-     *
-     * @param array $fieldInfo 字段结构
-     * @return array
-     */
-    private static function getColumnConfig(array $fieldInfo) {
-        if ($fieldInfo['is_pri']) {
-            return [
-                'hide' => true,
-            ];
-        }
-
-        $fieldConfig = [
-            'width' => 10,
-            'hide' => false,
-            'head_align' => 'left',
-            'body_align' => 'left',
-        ];
-
-        switch ($fieldInfo['type']) {
-            case 'int':
-            case 'tinyint':
-            case 'smallint':
-            case 'bigint':
-                $fieldConfig['width'] = 3;
-                break;
-            case 'decimal':
-                $fieldConfig['body_align'] = 'right';
-                $fieldConfig['width'] = 3;
-                break;
-            case 'date':
-            case 'datetime':
-                $fieldConfig['width'] = 4;
-                $fieldConfig['alias'] = sprintf('%s_text', $fieldInfo['name']);
-                break;
-        }
-
-        return $fieldConfig;
     }
 }
