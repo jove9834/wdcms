@@ -13,18 +13,32 @@ use app\gencode\common\Build;
 class Config
 {
     /**
+     * 生成参数
+     *
+     * @var array
+     */
+    private $context;
+
+    public function __construct($context)
+    {
+        $this->context = $context;
+    }
+
+    /**
      * 生成配置文件内容
      *
-     * @param $module
-     * @param $connection
-     * @param $table
      * @return string 生成的文件名
      * @throws \Exception
      */
-    public function make($module, $connection, $table) {
+    public function make() {
+        $module = $this->context['module'];
+        $connection = $this->context['connection'];
+        $table = $this->context['table'];
+
         $fields = Build::getTableFields($connection, $table);
         $config = [
             'connection' => $connection,
+            'name' => $table,
             'table' => $table,
             'title' => $table,
             'batch' => true, // 批量操作

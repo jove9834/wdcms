@@ -13,6 +13,7 @@ namespace app\gencode;
 use app\gencode\common\Build;
 use app\gencode\common\make\Config;
 use app\gencode\common\make\Controller;
+use app\gencode\common\make\Model;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Argument;
@@ -46,15 +47,26 @@ class Generate extends Command
         $table = trim($input->getArgument('table'));
 
         try {
+            $context = [
+                'module' => $module,
+                'connection' => $conn,
+                'template' => $template,
+                'code' => $code,
+                'table' => $table,
+            ];
+
             if ($code === 'config') {
                 // 生成配置文件
-                $makeConfig = new Config();
-                $fileName = $makeConfig->make($module, $conn, $table);
+                $makeConfig = new Config($context);
+                $fileName = $makeConfig->make();
             } elseif ($code === 'controller') {
-                $config = Build::getConfig($module, $table);
                 // 生成其他功能代码
-                $makeController = new Controller($config, $template, $module);
+                $makeController = new Controller($context);
                 $fileName = $makeController->make();
+            } elseif ($code === 'model') {
+                // 生成其他功能代码
+                $makeModel = new Model($context);
+                $fileName = $makeModel->make();
             }
 
             $output->writeln(sprintf('module: %s', $module));

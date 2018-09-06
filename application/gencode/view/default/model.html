@@ -1,0 +1,72 @@
+namespace {$package};
+
+use think\Model;
+
+/**
+ * Class {$className} {php}echo PHP_EOL;{/php}
+ *  {php}echo PHP_EOL;{/php}
+{foreach $fields as $fieldName => $attr }
+ * @property {:app\\gencode\\common\\Build::propertyType($attr)} {$fieldName} {$attr.title} {php}echo PHP_EOL;{/php}
+{/foreach}
+ * @package {$package} {php}echo PHP_EOL;{/php}
+ */
+class {$className} extends Model
+{
+    /**
+     * 默认的创建时间字段为create_time，更新时间字段为update_time
+     *
+     * @var string
+     */
+    protected $autoWriteTimestamp = 'datetime';
+
+    /**
+     * 别名属性
+     *
+     * @var array
+     */
+    protected $append = array('func_text');
+
+  {foreach $fields as $fieldName => $attr}
+    {if isset($attr['alias']) }
+    /**
+     * <描述>
+     *
+     * @param string $value 值
+     * @param mixed  $data  行数据
+     * @return string
+     */
+    public function get{:parse_name($attr['alias'], 1)}Attr($value, $data)
+    {
+        if (!$data['{$fieldName}']) {
+            return '';
+        }
+
+        // TODO: 实现代码
+
+        return $value;
+    }
+    {/if}
+  {/foreach}
+
+  {foreach $list as $fieldName => $attr}
+  {if isset($attr['alias']) }
+  /**
+   * <描述>
+   *
+   * @param string $value 值
+   * @param mixed  $data  行数据
+   * @return string
+   */
+  public function get{:parse_name($attr['alias'], 1)}Attr($value, $data)
+  {
+  if (!$data['{$fieldName}']) {
+  return '';
+  }
+
+  // TODO: 实现代码
+
+  return $value;
+  }
+  {/if}
+  {/foreach}
+}

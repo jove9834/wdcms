@@ -45,7 +45,7 @@ return [
         'default' => ['name'],
         'more' => [] // 更多查询条件配置
     ],
-    'list' => [
+    'list' => [ // 查询列表
         'id' => [
             'hide' => false,
         ],

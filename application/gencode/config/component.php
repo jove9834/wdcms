@@ -28,7 +28,7 @@ return [
         'name' => '下拉框',
         'attributes' => [
             'type' => ['name' => '类型', 'options' => ['normal', 'dict']],
-            'options' => '选项',
+            'options' => '选项/字典名称',
             'width' => '宽',
         ]
     ],
@@ -36,14 +36,14 @@ return [
         'name' => '单选框',
         'attributes' => [
             'type' => ['name' => '类型', 'options' => ['normal', 'dict']],
-            'options' => '选项',
+            'options' => '选项/字典名称',
         ]
     ],
     'checkbox' => [
         'name' => '复选框',
         'attributes' => [
             'type' => ['name' => '类型', 'options' => ['normal', 'dict']],
-            'options' => '选项',
+            'options' => '选项/字典名称',
         ]
     ],
     'date' => [

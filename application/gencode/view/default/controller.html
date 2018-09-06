@@ -1,28 +1,22 @@
 /**
  * 功能页面接口
  */
-namespace app\gencode\controller;
+namespace {$package};
 
-use app\gencode\model\Page;
-use think\Db;
-use think\db\Query;
-use think\facade\App;
 use think\Request;
+use {$modelFullClassName};
 
-class PageController
+class {$className}
 {
     /**
-     * 取Page列表
+     * 取资源列表
      *
      * @return \think\Response
      */
     public function index()
     {
-        $a = App::config();
-        var_dump($a);
-        // 查询状态为1的用户数据 并且每页显示10条数据
         try {
-            $list = Page::paginate(10);
+            $list = {$modelClassName}::paginate(PER_PAGE);
             $json = $list->render();
             return responseDataJson($json);
         } catch (\Exception $e) {
@@ -31,18 +25,18 @@ class PageController
     }
 
     /**
-    * 保存新建的资源
-    *
-    * @param \think\Request $request Request
-    * @return \think\Response
-    */
+     * 保存新建的资源
+     *
+     * @param \think\Request $request Request
+     * @return \think\Response
+     */
     public function save(Request $request)
     {
         $data = $request->param(false);
         try {
-            $page = new Page($data);
-            $page->save();
-            return responseDataJson($page);
+            $model = new {$modelClassName}($data);
+            $model->save();
+            return responseDataJson($model);
         } catch (\Exception $e) {
             return responseErrorJson($e->getMessage());
         }
@@ -62,7 +56,7 @@ class PageController
         }
 
         try {
-            $row = Page::get($id);
+            $row = {$modelClassName}::get($id);
             return $row ? responseDataJson($row) : responseErrorJson('记录不存在', 404);
         } catch (\Exception $e) {
             return responseErrorJson($e->getMessage());
@@ -80,54 +74,52 @@ class PageController
     {
         $data = $request->param(false);
         try {
-            $page = new Page();
-            $page->save($data, array('id' => $id));
-            return responseDataJson($page);
+            $model = new {$modelClassName}();
+            $model->save($data, array('id' => $id));
+            return responseDataJson($model);
         } catch (\Exception $e) {
             return responseErrorJson($e->getMessage());
         }
     }
-/**
-* 删除指定资源
-*
-* @param int $id ID
-* @return \think\Response
-* @throws \Exception
-*/
-public function delete($id)
-{
-$id = intval($id);
-if (!$id) {
-return responseErrorJson('无效参数');
-}
 
-$row = Page::get($id);
-if (!$row) {
-return responseErrorJson('记录不存在', 404);
-}
+    /**
+     * 删除指定资源
+     *
+     * @param int $id ID
+     * @return \think\Response
+     * @throws \Exception
+     */
+    public function delete($id)
+    {
+        $id = intval($id);
+        if (!$id) {
+            return responseErrorJson('无效参数');
+        }
 
-try {
-return $row->delete() ? responseDataJson('删除成功') : responseErrorJson('删除失败');
-} catch (\Exception $e) {
-return responseErrorJson('删除失败, 失败原因：' . $e->getMessage());
-}
-}
+        $row = {$modelClassName}::get($id);
+        if (!$row) {
+            return responseErrorJson('记录不存在', 404);
+        }
 
-/**
-* 取数据库的所有表
-*
-* @param string $conn 数据库连接名
-* @return \think\Response
-*/
-public function tables($conn = NULL)
-{
-/** @var \think\db\Query $query*/
-try {
-$query = Db::connect($conn);
-$tables = $query->getConnection()->getTables($query->getConfig('database'));
-return responseDataJson($tables);
-} catch (\Exception $e) {
-return responseErrorJson($e->getMessage());
-}
-}
+        try {
+            return $row->delete() ? responseDataJson('删除成功') : responseErrorJson('删除失败');
+        } catch (\Exception $e) {
+            return responseErrorJson('删除失败, 失败原因：' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 取用到的字典等资源
+     *
+     * @return \think\Response
+     */
+    public function resource()
+    {
+        try {
+            $resource = array();
+            return responseDataJson($resource);
+        } catch (\Exception $e) {
+            return responseErrorJson($e->getMessage());
+        }
+    }
 }

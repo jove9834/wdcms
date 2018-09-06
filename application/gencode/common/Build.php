@@ -81,6 +81,14 @@ class Build
         return $pathname;
     }
 
+    /**
+     * 取生成的配置文件
+     *
+     * @param string $module 模块名称
+     * @param string $table  表名
+     * @return mixed
+     * @throws \Exception
+     */
     public static function getConfig($module, $table) {
         $configFile = self::getConfigFile($module, $table);
         return include_once $configFile;
@@ -112,6 +120,32 @@ class Build
         }
 
         file_put_contents($pathname, $content);
+    }
+
+    /**
+     * 取字段转为属性类型
+     *
+     * @param mixed $field 字段属性
+     * @return string
+     */
+    public static function propertyType($field) {
+        $fieldType = $field['type'];
+        switch ($fieldType) {
+            case 'int':
+            case 'tinyint':
+            case 'smallint':
+            case 'bigint':
+                $type = 'int';
+                break;
+            case 'decimal':
+            case 'float':
+                $type = 'float';
+                break;
+            default:
+                $type = 'string';
+        }
+
+        return $type;
     }
 
 

@@ -10,7 +10,7 @@ namespace app\gencode\common\make;
 
 use app\gencode\common\Build;
 
-class Controller
+class Model
 {
     /**
      * 生成参数
@@ -31,7 +31,7 @@ class Controller
     }
 
     /**
-     * 生成控制器
+     * 生成模型
      *
      * @return string 生成的文件名
      * @throws \Exception
@@ -42,17 +42,15 @@ class Controller
         $template = $this->context['template'];
 
         $this->config = Build::getConfig($module, $table);
-        $template = 'gencode@' . $template . '/controller';
+        $template = 'gencode@' . $template . '/model';
         // 构造模板文件
         $className = $this->getClassName();
         $this->config['className'] = $className;
-        $this->config['package'] = $this->getPackageName('controller');
-        $this->config['modelClassName'] = parse_name($this->config['name'], 1);
-        $this->config['modelFullClassName'] = $this->getPackageName('model', true);
+        $this->config['package'] = $this->getPackageName('model');
         $response = view($template, $this->config);
         $content = "<?" . PHP_EOL . $response->getContent();
         $content = Build::formatPhpCode($content);
-        $fileName = sprintf('controller\%s.php', $className);
+        $fileName = sprintf('model\%s.php', $className);
         Build::writeFile($module, $fileName, $content);
         return $fileName;
     }
@@ -61,20 +59,13 @@ class Controller
      * 获取包名
      *
      * @param string $type         类型， controller, model
-     * @param bool   $includeClass 是否包含类名
      * @return string
      */
-    private function getPackageName($type, $includeClass = false) {
+    private function getPackageName($type) {
         if ($type === 'controller') {
             $package = sprintf('app\%s\controller', $this->context['module']);
-            $className = $this->getClassName();
         } else {
             $package = sprintf('app\%s\model', $this->context['module']);
-            $className = parse_name($this->config['name'], 1);
-        }
-
-        if ($includeClass) {
-            return sprintf('%s\%s', $package, $className);
         }
 
         return $package;
@@ -86,7 +77,7 @@ class Controller
      * @return string
      */
     private function getClassName() {
-        return parse_name($this->config['name'], 1) . 'Controller';
+        return parse_name($this->config['name'], 1);
     }
 
 }
