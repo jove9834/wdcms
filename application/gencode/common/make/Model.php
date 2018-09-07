@@ -80,4 +80,14 @@ class Model
         return parse_name($this->config['name'], 1);
     }
 
+    private function makeValidateRule($config) {
+        $rules = [];
+        foreach ($config['fields'] as $field) {
+            if (isset($field['validate'])) {
+                if (is_string($field['validate'])) {
+                    
+                }
+            }
+        }
+    }
 }
