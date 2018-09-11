@@ -32,8 +32,7 @@ class Generate extends Command
                 '数据库连接', '')
             ->addOption('template', 't', Option::VALUE_OPTIONAL,
                 '生成代码模板，默认EIP', 'default')
-            ->addOption('code', 'C', Option::VALUE_OPTIONAL,
-                '生成代码部分， model, controller, view, config')
+            ->addArgument('code', Argument::REQUIRED,'代码, all, model, controller, view, config')
             ->addArgument('table', Argument::REQUIRED,'表名')
             ->setDescription('代码生成工具');
     }
@@ -43,7 +42,7 @@ class Generate extends Command
         $module = $input->getOption('module');
         $conn = $input->getOption('conn');
         $template = $input->getOption('template');
-        $code = $input->getOption('code');
+        $code = trim($input->getArgument('code'));
         $table = trim($input->getArgument('table'));
 
         try {
