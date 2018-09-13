@@ -148,7 +148,61 @@ class Build
         return $type;
     }
 
+    /**
+     * 取字段的验证规则配置
+     *
+     * @param mixed $config 配置
+     * @return array
+     */
+    public static function getFieldRules($config) {
+        if (!$config) {
+            return [];
+        }
 
+        $rules = [];
+        $formFields = isset($config['form']['fields']) ? $config['form']['fields'] : [];
+        $fields = isset($config['fields']) ? $config['fields'] : [];
+        foreach ($fields as $name => $attr) {
+            if (isset($formFields[$name]) && isset($formFields[$name]['validate'])) {
+                // 以表单的配置为主
+                $rule = $formFields[$name]['validate'];
+            } elseif (isset($attr['validate'])) {
+                $rule = $attr['validate'];
+            } else {
+                continue;
+            }
+
+            if (is_array($rule)) {
+                $rules[$name] = $rule;
+            } else {
+                $rules[$name] = ['rule' => $rule];
+            }
+        }
+    }
+
+    /**
+     * 获取包名
+     *
+     * @param string $module    模块名
+     * @param string $type      类型， controller, model, validate
+     * @param string $className 类名
+     * @return string
+     */
+    public static function getPackageName($module, $type = 'controller', $className = '') {
+        $module = trim($module);
+        $type = trim($type);
+        $className = trim($className);
+        if (!$module || !$type) {
+            return NULL;
+        }
+
+        if ($className) {
+            $className = $type === 'controller' ? $className . 'Controller' : $className;
+            return sprintf('app\%s\%s\%s', $module, $type, $className);
+        } else {
+            return sprintf('app\%s\%s', $module, $type);
+        }
+    }
 
     /**
      * 格式化代码

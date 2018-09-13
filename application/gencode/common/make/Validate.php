@@ -10,7 +10,7 @@ namespace app\gencode\common\make;
 
 use app\gencode\common\Build;
 
-class Model
+class Validate
 {
     /**
      * 生成参数
@@ -42,33 +42,20 @@ class Model
         $template = $this->context['template'];
 
         $this->config = Build::getConfig($module, $table);
-        $template = 'gencode@' . $template . '/model';
+        $template = 'gencode@' . $template . '/validate';
         // 构造模板文件
         $className = $this->getClassName();
         $this->config['className'] = $className;
-        $this->config['package'] = $this->getPackageName('model');
+        $this->config['package'] = Build::getPackageName($module, 'model');
+        // 取验证规则
+        $rules = Build::getFieldRules($this->config);
+        $this->config['rules'] = $rules;
         $response = view($template, $this->config);
         $content = "<?" . PHP_EOL . $response->getContent();
         $content = Build::formatPhpCode($content);
-        $fileName = sprintf('model\%s.php', $className);
+        $fileName = sprintf('validate\%s.php', $className);
         Build::writeFile($module, $fileName, $content);
         return $fileName;
-    }
-
-    /**
-     * 获取包名
-     *
-     * @param string $type         类型， controller, model
-     * @return string
-     */
-    private function getPackageName($type) {
-        if ($type === 'controller') {
-            $package = sprintf('app\%s\controller', $this->context['module']);
-        } else {
-            $package = sprintf('app\%s\model', $this->context['module']);
-        }
-
-        return $package;
     }
 
     /**

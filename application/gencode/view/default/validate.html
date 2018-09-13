@@ -1,0 +1,24 @@
+namespace {$package};
+
+use think\Validate;
+
+class {$className} extends Validate
+{
+    protected $rule = array(
+        <?php foreach($rules as $key=>$vo):?>
+        <?php if(isset($vo['rule']) AND $vo['rule']):?>
+        '{$key}' => '{$vo['rule']}',
+        <?php endif;?>
+        <?php endforeach;?>
+    );
+
+    protected $message = array(
+        <?php foreach($rules as $key=>$vo):?>
+        <?php if (isset($vo['message']) AND $vo['message']):?>
+            <?php foreach($vo['message'] as $ruleKey => $msg): ?>
+                '{$key}.{$ruleKey}' => '{$msg}',
+            <?php endforeach;?>
+        <?php endif;?>
+        <?php endforeach;?>
+    );
+}

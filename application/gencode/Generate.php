@@ -14,6 +14,7 @@ use app\gencode\common\Build;
 use app\gencode\common\make\Config;
 use app\gencode\common\make\Controller;
 use app\gencode\common\make\Model;
+use app\gencode\common\make\Validate;
 use think\console\Command;
 use think\console\Input;
 use think\console\input\Argument;
@@ -45,7 +46,7 @@ class Generate extends Command
         $code = trim($input->getArgument('code'));
         $table = trim($input->getArgument('table'));
 
-        try {
+//        try {
             $context = [
                 'module' => $module,
                 'connection' => $conn,
@@ -66,6 +67,10 @@ class Generate extends Command
                 // 生成其他功能代码
                 $makeModel = new Model($context);
                 $fileName = $makeModel->make();
+            } elseif ($code === 'validate') {
+                // 生成其他功能代码
+                $validate = new Validate($context);
+                $fileName = $validate->make();
             }
 
             $output->writeln(sprintf('module: %s', $module));
@@ -74,9 +79,10 @@ class Generate extends Command
             $output->writeln(sprintf('template: %s', $template));
             $output->writeln(sprintf('code: %s', $code));
             $output->writeln(sprintf('generate file: %s', $fileName));
-        } catch (\Exception $e) {
-            $output->renderException($e);
-        }
+//        } catch (\Exception $e) {
+//            exception('异常消息', 10006);
+//            $output->renderException($e);
+//        }
     }
 
 }
