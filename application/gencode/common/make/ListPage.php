@@ -10,7 +10,7 @@ namespace app\gencode\common\make;
 
 use app\gencode\common\Build;
 
-class Validate extends BuildCode
+class ListPage extends BuildCode
 {
     /**
      * 生成模型
@@ -33,7 +33,7 @@ class Validate extends BuildCode
         $response = view($template, $this->config);
         $content = "<?php" . PHP_EOL . $response->getContent();
         $content = Build::formatPhpCode($content);
-        $fileName = sprintf('validate\%s.php', $className);
+        $fileName = sprintf('page\%s.php', $className);
         Build::writeFile($module, $fileName, $content);
         return $fileName;
     }

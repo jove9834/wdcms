@@ -178,6 +178,8 @@ class Build
                 $rules[$name] = ['rule' => $rule];
             }
         }
+
+        return $rules;
     }
 
     /**
@@ -185,22 +187,37 @@ class Build
      *
      * @param string $module    模块名
      * @param string $type      类型， controller, model, validate
-     * @param string $className 类名
+     * @param string $name      名称（一般为表名）
      * @return string
      */
-    public static function getPackageName($module, $type = 'controller', $className = '') {
+    public static function getPackageName($module, $type = 'controller', $name = '') {
         $module = trim($module);
         $type = trim($type);
-        $className = trim($className);
+        $name = trim($name);
         if (!$module || !$type) {
             return NULL;
         }
 
-        if ($className) {
-            $className = $type === 'controller' ? $className . 'Controller' : $className;
+        if ($name) {
+            $className = self::getClassName($name, $type === 'controller' ? 'controller' : NULL);
             return sprintf('app\%s\%s\%s', $module, $type, $className);
         } else {
             return sprintf('app\%s\%s', $module, $type);
+        }
+    }
+
+    /**
+     * 类名
+     *
+     * @param string $name   名称（一般为表名）
+     * @param string $suffix 类名后缀
+     * @return string
+     */
+    public static function getClassName($name, $suffix = '') {
+        if ($suffix) {
+            return parse_name($name, 1) . ucfirst($suffix);
+        } else {
+            return parse_name($name, 1);
         }
     }
 

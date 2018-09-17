@@ -4,19 +4,19 @@ use think\Validate;
 
 class {$className} extends Validate
 {
-    protected $rule = array(
-        <?php foreach($rules as $key=>$vo):?>
-        <?php if(isset($vo['rule']) AND $vo['rule']):?>
-        '{$key}' => '{$vo['rule']}',
-        <?php endif;?>
-        <?php endforeach;?>
+    protected $rule = array({php}echo PHP_EOL;{/php}
+        {foreach $rules as $key=>$vo }
+        {if isset($vo['rule']) AND $vo['rule'] }
+        '{$key}' => '{$vo['rule']}',{php}echo PHP_EOL;{/php}
+        {/if}
+        {/foreach}
     );
 
     protected $message = array(
         <?php foreach($rules as $key=>$vo):?>
         <?php if (isset($vo['message']) AND $vo['message']):?>
             <?php foreach($vo['message'] as $ruleKey => $msg): ?>
-                '{$key}.{$ruleKey}' => '{$msg}',
+                '{$key}.{$ruleKey}' => '{$msg}',{php}echo PHP_EOL;{/php}
             <?php endforeach;?>
         <?php endif;?>
         <?php endforeach;?>

@@ -3,11 +3,29 @@
  */
 namespace {$package};
 
+use think\Controller;
 use think\Request;
 use {$modelFullClassName};
 
-class {$className}
+/**
+ * Class {$className}
+ *
+ * @package {$package}
+ */
+class {$className} extends Controller
 {
+    /**
+     * 验证类
+     */
+    const VALIDATE_CLASS = "{$validateFullClassName}";
+
+    /**
+     * 是否批量验证
+     *
+     * @var boolean
+     */
+    protected $batchValidate = true;
+
     /**
      * 取资源列表
      *
@@ -34,6 +52,12 @@ class {$className}
     {
         $data = $request->param(false);
         try {
+            $result = $this->validate($data, self::VALIDATE_CLASS);
+            if (true !== $result) {
+                // 验证失败
+                return responseErrorJson('数据验证失败', 406, $result);
+            }
+
             $model = new {$modelClassName}($data);
             $model->save();
             return responseDataJson($model);
@@ -74,6 +98,12 @@ class {$className}
     {
         $data = $request->param(false);
         try {
+            $result = $this->validate($data, self::VALIDATE_CLASS);
+            if (true !== $result) {
+                // 验证失败
+                return responseErrorJson('数据验证失败', 406, $result);
+            }
+
             $model = new {$modelClassName}();
             $model->save($data, array('id' => $id));
             return responseDataJson($model);

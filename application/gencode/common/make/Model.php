@@ -10,26 +10,8 @@ namespace app\gencode\common\make;
 
 use app\gencode\common\Build;
 
-class Model
+class Model extends BuildCode
 {
-    /**
-     * 生成参数
-     *
-     * @var array
-     */
-    private $context;
-
-    private $config;
-
-    /**
-     * Controller constructor.
-     * @param $context
-     */
-    public function __construct($context)
-    {
-        $this->context = $context;
-    }
-
     /**
      * 生成模型
      *
@@ -38,45 +20,16 @@ class Model
      */
     public function make() {
         $module = $this->context['module'];
-        $table = $this->context['table'];
         $template = $this->context['template'];
-
-        $this->config = Build::getConfig($module, $table);
         $template = 'gencode@' . $template . '/model';
-        // 构造模板文件
-        $className = $this->getClassName();
+        $className = Build::getClassName($this->config['name']);
         $this->config['className'] = $className;
-        $this->config['package'] = $this->getPackageName('model');
+        $this->config['package'] = Build::getPackageName($module, 'model');
         $response = view($template, $this->config);
         $content = "<?" . PHP_EOL . $response->getContent();
         $content = Build::formatPhpCode($content);
         $fileName = sprintf('model\%s.php', $className);
         Build::writeFile($module, $fileName, $content);
         return $fileName;
-    }
-
-    /**
-     * 获取包名
-     *
-     * @param string $type         类型， controller, model
-     * @return string
-     */
-    private function getPackageName($type) {
-        if ($type === 'controller') {
-            $package = sprintf('app\%s\controller', $this->context['module']);
-        } else {
-            $package = sprintf('app\%s\model', $this->context['module']);
-        }
-
-        return $package;
-    }
-
-    /**
-     * 获取类名
-     *
-     * @return string
-     */
-    private function getClassName() {
-        return parse_name($this->config['name'], 1);
     }
 }
