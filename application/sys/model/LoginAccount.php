@@ -1,6 +1,7 @@
 <?
 namespace app\sys\model;
 
+use think\facade\Validate;
 use think\Model;
 
 /**
@@ -41,57 +42,4 @@ class LoginAccount extends Model {
      * @var array
      */
     protected $append = array('func_text');
-
-    /**
-     * 绑定登录账号
-     *
-     * @param int|User $user    用户ID或用户模型
-     * @param string   $account 账号名称
-     * @param int      $type    账号类型
-     * @return boolean
-     * @throws \think\Exception\DbException DB异常
-     * @throws \Exception 异常
-     */
-    public static function bindLoginAccount($user, $account, $type = self::ACCOUNT_TYPE_USERNAME) {
-        $account = trim($account);
-        if (!$user) {
-            throw new \Exception('用户不存在');
-        }
-
-        if (!$account) {
-            throw new \Exception('账号不能为空');
-        }
-
-        if ($type != self::ACCOUNT_TYPE_USERNAME && $type != self::ACCOUNT_TYPE_MOBILE && $type != self::ACCOUNT_TYPE_EMAIL) {
-            throw new \Exception('账号类型不正确');
-        }
-
-        if (is_int($user)) {
-            $user = User::get($user);
-            if (!$user) {
-                throw new \Exception('用户不存在');
-            }
-        }
-
-        $loginAccount = new LoginAccount([
-            'user_id' => $user->id,
-            'account' => $account,
-            'account_type' => $type
-        ]);
-
-        return $loginAccount->save();
-    }
-
-    /**
-     * 登录账号解绑
-     * @param $user
-     * @param $account
-     */
-    public static function unbindLoginAccount($user, $account) {
-
-    }
-
-    public static function checkLoginAccount($account) {
-
-    }
 }
