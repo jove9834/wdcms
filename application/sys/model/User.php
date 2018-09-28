@@ -21,6 +21,16 @@ use think\Model;
  */
 class User extends Model {
     /**
+     * 用户状态 -- 禁用
+     */
+    const USER_STATUS_DISABLED = 0;
+
+    /**
+     * 用户状态 -- 正常
+     */
+    const USER_STATUS_ENABLED = 1;
+
+    /**
      * 默认的创建时间字段为create_time，更新时间字段为update_time
      *
      * @var string

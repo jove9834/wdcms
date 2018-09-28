@@ -17,6 +17,15 @@ class IndexTest extends TestCase
 
     public function testBindLoginAccount()
     {
+        $procDefKeys = ['a', 'b'];
+        $pdKeys = NULL;
+        $a = array_values(array_intersect($procDefKeys, $pdKeys));
+        var_dump($a);
+        if ($a) {
+            echo 'aaaaaaaaaaaa';
+        } else {
+            echo 'bbbbbbbbbb';
+        }
         $ret = LoginAccount::bindLoginAccount(1, '13509334416', LoginAccount::ACCOUNT_TYPE_MOBILE);
         $this->assertTrue($ret ? true : false);
 

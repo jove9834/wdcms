@@ -9,7 +9,6 @@
  */
 namespace app\sys\service;
 
-use app\sys\common\LoginUser;
 use app\sys\model\LoginAccount;
 use app\sys\model\User;
 use app\sys\model\UserProfile;
@@ -80,62 +79,58 @@ class UserService
      * @param string $account  帐号
      * @param string $password 密码
      * @throws \Exception 1.帐号和密码不能为空 2.帐号或密码错误 3.帐号已被删除 4.帐号未激活, 5.帐号被锁定
-     * @return User 返回登录信息
+     * @return array 返回登录信息
      */
     public static function login($account, $password) {
         if (! $account || ! $password) {
-            throw new \Exception(lang('帐号、密码不能为空'), 1);
+            throw new \Exception('帐号、密码不能为空', 1);
         }
 
         if(static::isTimeLocked($account)) {
             // 帐号登录出错次数超过最大次数，被锁定
-            throw new \Exception(wd_print(lang('登录出错次数超过{}次，帐号已被锁定'), self::MAXIMUM_LOGIN_ATTEMPTS), 5);
+            throw new \Exception(sprintf('登录出错次数超过%d次，帐号已被锁定', self::MAXIMUM_LOGIN_ATTEMPTS), 5);
         }
 
-        $user = UserModel::instance()->getUserByAccount($account);
+        $user = self::getUserByAccount($account);
         if (! $user) {
             // 帐号不存在
             $msg = lang('帐号不存在');
-            LogService::writeLog('login', wd_print('error:{}, account:{}', $msg, $account));
-            throw new \Exception(lang('帐号或密码不正确'), 2);
+            LogService::addLog('login', sprintf('error:%s, account:%s', $msg, $account));
+            throw new \Exception('帐号或密码不正确', 2);
         }
 
         // 判断用户密码
-        $hashPassword = static::hashPassword($password, $user->getSalt());
-        Logger::debug('hashPassword:{}', $hashPassword);
-        if (strcasecmp($hashPassword, $user->getPassword()) != 0) {
+        $hashPassword = static::hashPassword($password, $user->salt);
+        if (strcasecmp($hashPassword, $user->password) !== 0) {
             // 密码不正确
             self::increaseLoginAttempts($account);
-            $msg = lang('密码不正确');
-            LogService::writeLog('login', wd_print('error:{}, account:{}', $msg, $account));
-            throw new \Exception(lang('帐号或密码不正确'), 2);
+            $msg = '密码不正确';
+            LogService::addLog('login', sprintf('error:%s, account:%s', $msg, $account));
+            throw new \Exception('帐号或密码不正确', 2);
         }
 
         // 判断用户状态
-        if ($user->isDel()) {
-            // 帐号已删除
-            throw new \Exception(lang('帐号已删除'), 3);
+        if ($user->status === User::USER_STATUS_DISABLED) {
+            // 帐号已禁用
+            throw new \Exception('帐号已禁用', 3);
         }
 
-        if ($user->isActive()) {
-            // 帐号未激活
-            throw new \Exception(lang('帐号未激活'), 4);
-        }
-
-        $loginUser = LoginUser::create();
-        $loginUser->setUid($user->getUid());
-        $loginUser->setName($user->getName());
-        $loginUser->setGender($user->getGender());
-        $loginUser->setAvatar($user->getAvatar());
+        $loginUser = ['user_id' => $user->id];
 
         // 生成CookieKey
-        self::saveSession(self::getCookieCode(), $loginUser);
+        $token = self::getCookieCode();
+        self::saveSession($token, $loginUser);
 
         // 写日志
-        LogService::writeLog('login', $account, $user->getUid());
+        LogService::addLog('login', $account, $user->id);
         // 清除登录尝试记录
         self::clearLoginAttempts($account);
-        return $user;
+        return [
+            'user_id' => $user->id,
+            'real_name' => $user->real_name,
+            'avatar' => $user->avatar,
+            'access_token' => $token
+        ];
     }
 
     /**
@@ -144,11 +139,11 @@ class UserService
      * @return void
      */
     public static function logout() {
-        $user = self::getLoginUser();
+        $userId = self::getLoginUserId();
         self::destorySession();
-        if ($user) {
+        if ($userId) {
             // 写日志
-            LogService::writeLog('logout', NULL, $user->getUid());
+            LogService::addLog('logout', NULL, $userId);
         }
     }
 
@@ -158,7 +153,9 @@ class UserService
      * @return boolean
      **/
     public static function isLogined() {
-        $uid = self::getLoginUid();
+        // 取access token
+
+        $uid = self::getLoginUserId();
 
         return $uid ? TRUE : FALSE;
     }
@@ -166,29 +163,23 @@ class UserService
     /**
      * 取登录用户信息
      *
-     * @return LoginUser|boolean
+     * @return array
      */
     public static function getLoginUser() {
         // 取得cacheKey
         $data = Cache::get(self::getCookieCode());
-        if ($data) {
-            return LoginUser::fromJson($data);
-        }
-        else {
-            // self::destorySession();
-            return FALSE;
-        }
+        return $data ? json_decode($data, TRUE) : NULL;
     }
 
     /**
      * 取当前登录用户ID
      *
-     * @return integer|boolean
+     * @return integer|null
      */
-    public static function getLoginUid() {
+    public static function getLoginUserId() {
         if (! self::$loginUid) {
             $loginUser = static::getLoginUser();
-            self::$loginUid = $loginUser ? $loginUser->getUid() : FALSE;
+            self::$loginUid = $loginUser ? $loginUser['user_id'] : NULL;
         }
 
         return self::$loginUid;
@@ -225,16 +216,17 @@ class UserService
             $userId = $info->save();
 
             if (! $userId) {
-                return FALSE;
+                throw new \Exception('创建帐号出现异常');
             }
 
             // 添加帐号
             self::bindLoginAccount($info, $account, $type);
 
             // 写创建账号成功日志
+            LogService::addLog('user_add', '创建账号成功', $userId);
             return $info;
         } catch (\Exception $e) {
-            // LogService::writeLog('create_account', wd_print('创建帐号出现异常， 异常信息：{}', $e->getMessage()), $uid);
+            LogService::addLog('user_add', sprintf('创建帐号出现异常， 异常信息：%s', $e->getMessage()));
             throw $e;
         }
     }
@@ -643,5 +635,17 @@ class UserService
 
         $loginAccount = LoginAccount::get(['account' => $account]);
         return $loginAccount ? $loginAccount->user_id : NULL;
+    }
+
+    /**
+     * 根据登录账号取用户信息
+     *
+     * @param string $account 账号名
+     * @return User|null
+     * @throws \think\exception\DbException 异常
+     */
+    public static function getUserByAccount($account) {
+        $userId = self::getUserIdByAccount($account);
+        return User::get($userId);
     }
 }
