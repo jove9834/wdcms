@@ -24,7 +24,7 @@ class Validate extends BuildCode
 
         $template = 'gencode@' . $template . '/validate';
         // 构造模板文件
-        $className = Build::getClassName($this->config['name']);
+        $className = Build::getClassName($this->config['name'], 'Validate');
         $this->config['className'] = $className;
         $this->config['package'] = Build::getPackageName($module, 'model');
         // 取验证规则

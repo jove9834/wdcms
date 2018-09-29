@@ -14,6 +14,7 @@ use app\sys\model\User;
 use app\sys\model\UserProfile;
 use think\facade\Cache;
 use think\facade\Config;
+use think\facade\Cookie;
 use think\facade\Request;
 use think\facade\Validate;
 
@@ -60,11 +61,11 @@ class UserService
     const COOKIE_SECURITY_CODE = '3fcf273f383d324ccb05aaec9fcc0ec7a0a2a67e';
 
     /**
-     * cookie code
+     * Access Token
      *
      * @var string
      */
-    static $cookieCode = NULL;
+    static $accessToken = NULL;
 
     /**
      * 登录用户ID
@@ -94,7 +95,7 @@ class UserService
         $user = self::getUserByAccount($account);
         if (! $user) {
             // 帐号不存在
-            $msg = lang('帐号不存在');
+            $msg = '帐号不存在';
             LogService::addLog('login', sprintf('error:%s, account:%s', $msg, $account));
             throw new \Exception('帐号或密码不正确', 2);
         }
@@ -118,7 +119,7 @@ class UserService
         $loginUser = ['user_id' => $user->id];
 
         // 生成CookieKey
-        $token = self::getCookieCode();
+        $token = self::getAccessToken();
         self::saveSession($token, $loginUser);
 
         // 写日志
@@ -153,22 +154,24 @@ class UserService
      * @return boolean
      **/
     public static function isLogined() {
-        // 取access token
-
         $uid = self::getLoginUserId();
-
         return $uid ? TRUE : FALSE;
     }
 
     /**
      * 取登录用户信息
      *
-     * @return array
+     * @return User
+     * @throws \think\Exception\DbException DB异常
      */
     public static function getLoginUser() {
-        // 取得cacheKey
-        $data = Cache::get(self::getCookieCode());
-        return $data ? json_decode($data, TRUE) : NULL;
+        $loginUserId = self::getLoginUserId();
+        if (!$loginUserId) {
+            // 未登录
+            return NULL;
+        }
+
+        return User::get($loginUserId);
     }
 
     /**
@@ -178,7 +181,12 @@ class UserService
      */
     public static function getLoginUserId() {
         if (! self::$loginUid) {
-            $loginUser = static::getLoginUser();
+            $data = Cache::get(self::getAccessToken());
+            if (!$data) {
+                return NULL;
+            }
+
+            $loginUser = json_decode($data, TRUE);
             self::$loginUid = $loginUser ? $loginUser['user_id'] : NULL;
         }
 
@@ -271,33 +279,32 @@ class UserService
      * @return void
      */
     private static function destorySession() {
-        $code = self::getCookieCode();
+        $code = self::getAccessToken();
         Cache::rm($code);
-        self::$cookieCode = NULL;
+        self::$accessToken = NULL;
         self::$loginUid = NULL;
     }
 
     /**
      * 获取COOKIE保存的CODE
      *
-     * @param boolean $force 当CODE为空时是否强制刷新
      * @return string 32位的MD5 KEY
      */
-    private static function getCookieCode($force = FALSE) {
-        if ($force) {
-            // 强制生成cookieCode
-            self::$cookieCode = self::generateUserCookie();
-        }
+    private static function getAccessToken() {
+        if (! self::$accessToken) {
+            if (Config::get('site.use_cookie')) {
+                self::$accessToken = is_array($_COOKIE) && isset($_COOKIE['__USER__']) ? $_COOKIE['__USER__'] : '';
+            } else {
+                self::$accessToken = Request::header(Config::get('site.token_header'));
+            }
 
-        if (! self::$cookieCode) {
-            self::$cookieCode = is_array($_COOKIE) && isset($_COOKIE['__USER__']) ? $_COOKIE['__USER__'] : '';
             // 如果CODE为空，则再去生成下
-            if (! self::$cookieCode) {
-                self::$cookieCode = self::generateUserCookie();
+            if (! self::$accessToken) {
+                self::$accessToken = self::generateUserCookie();
             }
         }
 
-        return self::$cookieCode;
+        return self::$accessToken;
     }
 
     /**
@@ -307,11 +314,8 @@ class UserService
      */
     private static function generateUserCookie() {
         $code = md5(self::COOKIE_SECURITY_CODE . '-' . microtime() . '-' . mt_rand());
-        $cookie_domain = Config::get('app.cookie_domain');
-        if ($cookie_domain) {
-            setcookie('__USER__', $code, time() + self::CACHE_EXPIRE, '/', $cookie_domain);
-        } else {
-            setcookie('__USER__', $code, time() + self::CACHE_EXPIRE, '/');
+        if (Config::get('site.use_cookie')) {
+            Cookie::set('__USER__', $code, ['expire' => self::CACHE_EXPIRE]);
         }
 
         return $code;

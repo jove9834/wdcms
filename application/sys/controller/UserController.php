@@ -6,7 +6,7 @@ namespace app\sys\controller;
 
 use think\Controller;
 use think\Request;
-use app\sys\model\User;
+use app\sys\model\UserValidate;
 
 /**
  * Class UserController *
@@ -15,7 +15,7 @@ class UserController extends Controller {
     /**
      * 验证类
      */
-    const VALIDATE_CLASS = "app\sys\validate\User";
+    const VALIDATE_CLASS = 'app\sys\validate\UserValidate';
     
     /**
      * 是否批量验证
@@ -31,7 +31,7 @@ class UserController extends Controller {
      */
     public function index() {
         try {
-            $list = User::paginate(PER_PAGE);
+            $list = UserValidate::paginate(PER_PAGE);
             $json = $list->render();
             return responseDataJson($json);
         }
@@ -55,7 +55,7 @@ class UserController extends Controller {
                 return responseErrorJson('数据验证失败', 406, $result);
             }
             
-            $model = new User($data);
+            $model = new UserValidate($data);
             $model->save();
             return responseDataJson($model);
         }
@@ -77,7 +77,7 @@ class UserController extends Controller {
         }
         
         try {
-            $row = User::get($id);
+            $row = UserValidate::get($id);
             return $row ? responseDataJson($row) : responseErrorJson('记录不存在', 404);
         }
         catch (\Exception $e) {
@@ -101,7 +101,7 @@ class UserController extends Controller {
                 return responseErrorJson('数据验证失败', 406, $result);
             }
             
-            $model = new User();
+            $model = new UserValidate();
             $model->save($data, array(
                 'id' => $id
             ));
@@ -125,7 +125,7 @@ class UserController extends Controller {
             return responseErrorJson('无效参数');
         }
         
-        $row = User::get($id);
+        $row = UserValidate::get($id);
         if (!$row) {
             return responseErrorJson('记录不存在', 404);
         }
