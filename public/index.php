@@ -16,6 +16,13 @@ namespace think;
 require __DIR__ . '/../thinkphp/base.php';
 
 // 支持事先使用静态方法设置Request对象和Config对象
+if (\think\facade\Request::isOptions()) {
+    header("Access-Control-Allow-Method: GET, POST, PUT, DEL");
+    header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, access_token");
+    header('Access-Control-Allow-Origin: http://localhost:9527');
+    header('Access-Control-Allow-Credentials: true');
+    exit();
+}
 
 // 执行应用并响应
 Container::get('app')->run()->send();

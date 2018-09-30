@@ -20,10 +20,10 @@ if (!function_exists('responseErrorJson')) {
      */
     function responseErrorJson($message, $code = 500, array $extra = array(), $httpStatus = 500)
     {
-//    header("Access-Control-Allow-Method: GET, POST, PUT, DEL");
-//    header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
-//    header('Access-Control-Allow-Origin: http://localhost:9090');
-//    header('Access-Control-Allow-Credentials: true');
+        header("Access-Control-Allow-Method: GET, POST, PUT, DEL");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, access_token");
+        header('Access-Control-Allow-Origin: http://localhost:9527');
+        header('Access-Control-Allow-Credentials: true');
         $json = array();
         $json["error"] = array();
         $json["error"]["code"] = $code ?: 500;
@@ -48,10 +48,10 @@ if (!function_exists('responseDataJson')) {
      */
     function responseDataJson($data, $httpStatus = 200)
     {
-//    header("Access-Control-Allow-Method: GET, POST, PUT, DEL");
-//    header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
-//    header('Access-Control-Allow-Origin: http://localhost:9090');
-//    header('Access-Control-Allow-Credentials: true');
+        header("Access-Control-Allow-Method: GET, POST, PUT, DEL");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, access_token");
+        header('Access-Control-Allow-Origin: http://localhost:9527');
+        header('Access-Control-Allow-Credentials: true');
 
         $json = array();
         $json["data"] = $data;
